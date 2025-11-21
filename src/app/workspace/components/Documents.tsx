@@ -9,6 +9,7 @@ import {
     File,
     FileImage,
     Presentation,
+    ChevronDown,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -245,23 +246,24 @@ const Documents: React.FC = () => {
 
                 {/* ----- Search and Filter Bar ----- */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
-                    <div className="flex items-center gap-3">
-                        <div className="relative">
+                    <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:flex-initial min-w-[200px]">
                             <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${styles.searchIcon}`} />
                             <input
                                 type="text"
                                 placeholder="Search documents..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className={`pl-9 pr-3 py-2 border rounded-lg focus:ring-2 outline-none w-56 text-sm ${styles.input}`}
+                                className={`w-full sm:w-56 pl-9 pr-3 py-2 border rounded-lg focus:ring-2 outline-none text-sm ${styles.input}`}
                             />
                         </div>
-                        <div className="relative">
-                            <Filter className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${styles.searchIcon}`} />
+                        <div className="relative w-[150px]">
+                            <Filter className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${styles.searchIcon} pointer-events-none z-10`} />
                             <select
                                 value={filterType}
                                 onChange={(e) => handleFilterChange(e.target.value)}
-                                className={`pl-9 pr-8 py-2 border rounded-lg focus:ring-2 outline-none text-sm ${styles.input} ${styles.inputBg}`}
+                                className={`w-full pl-9 pr-8 py-2 border rounded-lg focus:ring-2 outline-none text-sm ${styles.input} ${styles.inputBg}`}
+                                style={{ backgroundImage: 'none' }}
                             >
                                 {DOCUMENT_TYPES.map((type) => (
                                     <option key={type} value={type}>
@@ -269,9 +271,10 @@ const Documents: React.FC = () => {
                                     </option>
                                 ))}
                             </select>
+                            <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 ${styles.searchIcon} pointer-events-none`} />
                         </div>
                     </div>
-                    <div className={`text-xs ${styles.counter}`}>
+                    <div className={`text-xs ${styles.counter} whitespace-nowrap`}>
                         {filteredDocuments.length} of {documents.length} documents
                     </div>
                 </div>

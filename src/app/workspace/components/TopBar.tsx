@@ -1,20 +1,35 @@
 'use client';
 
 import React from 'react';
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/contexts/ThemeContext';
 
-export const TopBar: React.FC = () => {
+interface TopBarProps {
+  onMobileMenuToggle: () => void;
+}
+
+export const TopBar: React.FC<TopBarProps> = ({ onMobileMenuToggle }) => {
   const { theme } = useTheme();
 
   return (
-    <header className={`border-b px-6 py-4 transition-colors ${
+    <header className={`border-b px-4 sm:px-6 py-3 sm:py-4 transition-colors ${
       theme === 'dark'
         ? 'bg-black/50 border-blue-500/20 backdrop-blur-sm'
         : 'bg-sky-50 border-sky-200'
     }`}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={onMobileMenuToggle}
+          className={`lg:hidden p-2 rounded-lg transition-colors ${
+            theme === 'dark'
+              ? 'text-cyan-300 hover:text-cyan-100 hover:bg-blue-900/30'
+              : 'text-slate-500 hover:text-slate-700 hover:bg-sky-100'
+          }`}
+        >
+          <Menu className="w-5 h-5" />
+        </button>
         {/* Search */}
         <div className="flex-1 max-w-md">
           <div className="relative">
@@ -23,7 +38,7 @@ export const TopBar: React.FC = () => {
             }`} />
             <input
               type="text"
-              placeholder="Search people, projects or tasks"
+              placeholder="Search..."
               className={`w-full rounded-lg pl-10 pr-4 py-2 text-sm transition-all ${
                 theme === 'dark'
                   ? 'bg-slate-900/80 border border-blue-500/30 text-cyan-100 placeholder-cyan-400/60 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400'
@@ -33,7 +48,7 @@ export const TopBar: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Theme Toggle */}
           <ThemeToggle />
 
@@ -49,7 +64,7 @@ export const TopBar: React.FC = () => {
           </button>
 
           {/* User Avatar */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <img
               src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop"
               alt="User"
@@ -57,7 +72,7 @@ export const TopBar: React.FC = () => {
                 theme === 'dark' ? 'ring-blue-500/50' : 'ring-sky-200'
               }`}
             />
-            <div className="hidden sm:block">
+            <div className="hidden md:block">
               <p className={`text-sm font-medium ${
                 theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
               }`}>Sarah Chen</p>

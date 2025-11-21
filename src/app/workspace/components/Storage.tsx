@@ -199,28 +199,28 @@ const Storage: React.FC = () => {
         </div>
 
         {/* ----- Storage Stats Card ----- */}
-        <div className={`rounded-xl p-6 shadow-sm border mb-6 ${styles.card}`}>
-          <div className="flex items-center gap-10">
-            <div>
+        <div className={`rounded-xl p-4 sm:p-6 shadow-sm border mb-6 ${styles.card}`}>
+          <div className="flex flex-wrap items-start gap-6 sm:gap-8">
+            <div className="min-w-[100px]">
               <p className={`text-sm ${styles.statLabel}`}>Total Files</p>
               <p className={`text-2xl font-bold ${styles.statValue}`}>{files.length}</p>
             </div>
-            <div>
+            <div className="min-w-[100px]">
               <p className={`text-sm ${styles.statLabel}`}>Total Size</p>
               <p className={`text-2xl font-bold ${styles.statValue}`}>
                 {totalSize.toFixed(1)} MB
               </p>
             </div>
-            <div>
+            <div className="min-w-[200px] flex-1">
               <p className={`text-sm ${styles.statLabel}`}>Storage Used</p>
-              <div className="flex items-center gap-2 mt-1">
-                <div className={`w-40 rounded-full h-2 ${styles.progressBar}`}>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1">
+                <div className={`w-full sm:w-32 md:w-40 rounded-full h-2 ${styles.progressBar}`}>
                   <div
                     className={`h-2 rounded-full ${styles.progressFill}`}
                     style={{ width: '48%' }}
                   ></div>
                 </div>
-                <span className={`text-sm ${styles.tableSecondary}`}>2.4 GB / 5 GB</span>
+                <span className={`text-sm ${styles.tableSecondary} whitespace-nowrap`}>2.4 GB / 5 GB</span>
               </div>
             </div>
           </div>

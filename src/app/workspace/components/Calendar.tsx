@@ -121,16 +121,16 @@ export const Calendar: React.FC = () => {
     <div className="flex-1 p-6 overflow-y-auto scrollbar-thin">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className={`text-3xl font-bold mb-2 ${
+            <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
               theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
             }`}>Calendar</h1>
             <p className={theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'}>
               Schedule and track important events and deadlines.
             </p>
           </div>
-          <button className={`px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors ${
+          <button className={`px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors ${
             theme === 'dark'
               ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/50'
               : 'bg-sky-400 hover:bg-sky-500 text-white'
@@ -149,9 +149,9 @@ export const Calendar: React.FC = () => {
                 : 'bg-white border border-slate-200'
             }`}>
               {/* Calendar Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <h2 className={`text-xl font-semibold ${
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center justify-between sm:justify-start sm:space-x-4">
+                  <h2 className={`text-lg sm:text-xl font-semibold ${
                     theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
                   }`}>
                     {monthNames[currentMonth]} {currentYear}
@@ -169,22 +169,30 @@ export const Calendar: React.FC = () => {
                     </button>
                     <button
                       onClick={() => navigateMonth('next')}
-                      className="p-2 text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors"
+                      className={`p-2 rounded-lg transition-colors ${
+                        theme === 'dark'
+                          ? 'text-cyan-300 hover:text-cyan-100 hover:bg-blue-900/30'
+                          : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
+                      }`}
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center gap-2">
                   {(['month', 'week', 'day'] as const).map((viewType) => (
                     <button
                       key={viewType}
                       onClick={() => setView(viewType)}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      className={`px-4 py-1.5 rounded text-sm font-medium transition-colors whitespace-nowrap ${
                         view === viewType
-                          ? 'bg-sky-400 text-white'
-                          : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
+                          ? theme === 'dark'
+                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/50'
+                            : 'bg-sky-400 text-white'
+                          : theme === 'dark'
+                            ? 'text-cyan-300 hover:text-cyan-100 hover:bg-blue-900/30'
+                            : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
                       }`}
                     >
                       {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
@@ -194,11 +202,14 @@ export const Calendar: React.FC = () => {
               </div>
 
               {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-1">
+              <div className="grid grid-cols-7 gap-px bg-slate-200">
                 {/* Week day headers */}
-                {weekDays.map((day) => (
-                  <div key={day} className="p-3 text-center text-sm font-medium text-slate-600">
-                    {day}
+                {weekDays.map((day, idx) => (
+                  <div key={day} className={`p-2 sm:p-3 text-center text-xs sm:text-sm font-medium ${
+                    theme === 'dark' ? 'bg-slate-800/60 text-cyan-300' : 'bg-slate-50 text-slate-600'
+                  }`}>
+                    <span className="hidden sm:inline">{day}</span>
+                    <span className="sm:hidden">{day.slice(0, 1)}</span>
                   </div>
                 ))}
 
@@ -209,12 +220,22 @@ export const Calendar: React.FC = () => {
                   return (
                     <div
                       key={index}
-                      className={`min-h-24 p-2 border border-slate-200 hover:bg-sky-50 transition-colors cursor-pointer ${
-                        !day.isCurrentMonth ? 'bg-slate-50 text-slate-400' : 'bg-white'
-                      } ${day.isToday ? 'ring-2 ring-sky-400' : ''}`}
+                      className={`min-h-16 sm:min-h-24 p-1 sm:p-2 transition-colors cursor-pointer ${
+                        theme === 'dark'
+                          ? !day.isCurrentMonth 
+                            ? 'bg-slate-900/30 text-cyan-400/50'
+                            : 'bg-slate-900/60 hover:bg-blue-900/30'
+                          : !day.isCurrentMonth 
+                            ? 'bg-slate-50 text-slate-400' 
+                            : 'bg-white hover:bg-sky-50'
+                      } ${day.isToday ? theme === 'dark' ? 'ring-2 ring-cyan-400' : 'ring-2 ring-sky-400' : ''}`}
                     >
-                      <div className={`text-sm font-medium mb-1 ${
-                        day.isToday ? 'text-sky-700' : day.isCurrentMonth ? 'text-slate-700' : 'text-slate-400'
+                      <div className={`text-xs sm:text-sm font-medium mb-1 ${
+                        day.isToday 
+                          ? theme === 'dark' ? 'text-cyan-400' : 'text-sky-700'
+                          : day.isCurrentMonth 
+                            ? theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+                            : theme === 'dark' ? 'text-cyan-400/50' : 'text-slate-400'
                       }`}>
                         {day.date}
                       </div>

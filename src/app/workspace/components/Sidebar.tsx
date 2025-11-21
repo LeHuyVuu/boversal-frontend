@@ -49,9 +49,11 @@ interface SidebarProps {
       | 'storage'
       | 'documents'
   ) => void;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
 }
 
-export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
+export const Sidebar = ({ activeSection, onSectionChange, isMobileMenuOpen, setIsMobileMenuOpen }: SidebarProps) => {
   const { theme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [projectsExpanded, setProjectsExpanded] = useState(false);
@@ -76,13 +78,30 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   }, []);
 
   return (
-    <div
-      className={`border-r flex flex-col h-screen transition-all duration-300 ${
-        theme === 'dark'
-          ? 'bg-black/80 border-blue-500/20 backdrop-blur-md'
-          : 'bg-white border-slate-200'
-      } ${isCollapsed ? 'w-16' : 'w-52'}`}
-    >
+    <>
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <div
+        className={`border-r flex flex-col h-screen transition-all duration-300 ${
+          theme === 'dark'
+            ? 'bg-black/80 border-blue-500/20 backdrop-blur-md'
+            : 'bg-white border-slate-200'
+        } ${
+          isCollapsed ? 'w-16' : 'w-52'
+        } ${
+          // Mobile: fixed position, slide in/out
+          isMobileMenuOpen 
+            ? 'fixed left-0 top-0 z-50 translate-x-0' 
+            : 'fixed left-0 top-0 z-50 -translate-x-full lg:translate-x-0 lg:relative lg:z-auto'
+        }`}
+      >
       {/* Logo + Toggle */}
       <div className="flex items-center justify-between m-4">
         {/* Logo */}
@@ -210,5 +229,6 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
         </div>
       </nav>
     </div>
+    </>
   );
 };
