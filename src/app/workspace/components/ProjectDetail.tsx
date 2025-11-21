@@ -87,3 +87,4 @@ const ProjectDetail = () => {
 };
 
 export default ProjectDetail;
+export { ProjectDetail };

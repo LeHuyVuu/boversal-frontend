@@ -12,8 +12,10 @@ import {
   User
 } from 'lucide-react';
 import mockIssues from '@/mocks/mockIssues.json';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export const Issues: React.FC = () => {
+  const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState<'All' | 'Low' | 'Medium' | 'High' | 'Critical'>('All');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Open' | 'In Progress' | 'Resolved' | 'Closed'>('All');
@@ -82,10 +84,18 @@ export const Issues: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">Issues</h1>
-            <p className="text-slate-600">Track and resolve bugs, features, and tasks.</p>
+            <h1 className={`text-3xl font-bold mb-2 ${
+              theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+            }`}>Issues</h1>
+            <p className={theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'}>
+              Track and resolve bugs, features, and tasks.
+            </p>
           </div>
-          <button className="bg-sky-400 hover:bg-sky-500 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
+          <button className={`px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors ${
+            theme === 'dark'
+              ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/50'
+              : 'bg-sky-400 hover:bg-sky-500 text-white'
+          }`}>
             <Plus className="w-4 h-4" />
             <span>Create Issue</span>
           </button>
@@ -94,22 +104,32 @@ export const Issues: React.FC = () => {
         {/* Filters */}
         <div className="flex items-center space-x-4 mb-6">
           <div className="flex-1 max-w-md relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+              theme === 'dark' ? 'text-cyan-400' : 'text-slate-400'
+            }`} />
             <input
               type="text"
               placeholder="Search issues..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400"
+              className={`w-full rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 ${
+                theme === 'dark'
+                  ? 'bg-slate-900/80 border border-blue-500/30 text-cyan-100 placeholder-cyan-400/60 focus:border-cyan-400 focus:ring-cyan-400'
+                  : 'bg-white border border-slate-300 text-slate-700 placeholder-slate-400 focus:border-sky-400 focus:ring-sky-400'
+              }`}
             />
           </div>
           
           <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-slate-500" />
+            <Filter className={`w-4 h-4 ${theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'}`} />
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value as 'All' | 'Low' | 'Medium' | 'High' | 'Critical')}
-              className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:border-sky-400"
+              className={`rounded-lg px-3 py-2 text-sm focus:outline-none ${
+                theme === 'dark'
+                  ? 'bg-slate-900/80 border border-blue-500/30 text-cyan-100 focus:border-cyan-400'
+                  : 'bg-white border border-slate-300 text-slate-700 focus:border-sky-400'
+              }`}
             >
               <option value="All">All Priorities</option>
               <option value="Critical">Critical</option>
@@ -121,7 +141,11 @@ export const Issues: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as 'All' | 'Open' | 'In Progress' | 'Resolved' | 'Closed')}
-              className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:border-sky-400"
+              className={`rounded-lg px-3 py-2 text-sm focus:outline-none ${
+                theme === 'dark'
+                  ? 'bg-slate-900/80 border border-blue-500/30 text-cyan-100 focus:border-cyan-400'
+                  : 'bg-white border border-slate-300 text-slate-700 focus:border-sky-400'
+              }`}
             >
               <option value="All">All Status</option>
               <option value="Open">Open</option>
@@ -138,30 +162,50 @@ export const Issues: React.FC = () => {
             const TypeIcon = getTypeIcon(issue.type);
             
             return (
-              <div key={issue.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:border-sky-300 hover:shadow-md transition-all duration-200 cursor-pointer group">
+              <div key={issue.id} className={`rounded-lg p-6 transition-all duration-200 cursor-pointer group ${
+                theme === 'dark'
+                  ? 'bg-slate-900/60 border border-blue-500/20 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/20 backdrop-blur-sm'
+                  : 'bg-white border border-slate-200 hover:border-sky-300 hover:shadow-md'
+              }`}>
                 <div className="flex items-start space-x-4">
                   {/* Type Icon */}
                   <div className="flex-shrink-0 mt-1">
-                    <div className="w-8 h-8 bg-sky-50 rounded-lg flex items-center justify-center group-hover:bg-sky-100 transition-colors">
-                      <TypeIcon className="w-4 h-4 text-slate-600" />
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-blue-900/30 group-hover:bg-blue-900/50'
+                        : 'bg-sky-50 group-hover:bg-sky-100'
+                    }`}>
+                      <TypeIcon className={`w-4 h-4 ${
+                        theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
+                      }`} />
                     </div>
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-3 mb-2">
-                      <span className="text-sm font-medium text-slate-600">{issue.code}</span>
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
+                      }`}>{issue.code}</span>
                       <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(issue.priority)}`}>
                         {issue.priority}
                       </span>
-                      <span className="text-xs text-slate-500">{issue.type}</span>
+                      <span className={`text-xs ${
+                        theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                      }`}>{issue.type}</span>
                     </div>
                     
-                    <h3 className="text-lg font-medium text-slate-800 mb-2 group-hover:text-sky-600 transition-colors">
+                    <h3 className={`text-lg font-medium mb-2 transition-colors ${
+                      theme === 'dark'
+                        ? 'text-cyan-100 group-hover:text-cyan-300'
+                        : 'text-slate-800 group-hover:text-sky-600'
+                    }`}>
                       {issue.title}
                     </h3>
                     
-                    <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+                    <p className={`text-sm mb-4 line-clamp-2 ${
+                      theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
+                    }`}>
                       {issue.description}
                     </p>
 
@@ -169,7 +213,11 @@ export const Issues: React.FC = () => {
                     {issue.labels.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-4">
                         {issue.labels.map((label) => (
-                          <span key={label} className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">
+                          <span key={label} className={`text-xs px-2 py-1 rounded ${
+                            theme === 'dark'
+                              ? 'bg-blue-900/30 text-cyan-300'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}>
                             {label}
                           </span>
                         ))}
@@ -185,18 +233,26 @@ export const Issues: React.FC = () => {
                             alt={issue.assignee.name}
                             className="w-6 h-6 rounded-full"
                           />
-                          <span className="text-sm text-slate-700">{issue.assignee.name}</span>
+                          <span className={`text-sm ${
+                            theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
+                          }`}>{issue.assignee.name}</span>
                         </div>
                         
                         <div className="flex items-center space-x-1">
-                          <Clock className="w-4 h-4 text-slate-500" />
-                          <span className="text-sm text-slate-600">{formatDate(issue.updatedAt)}</span>
+                          <Clock className={`w-4 h-4 ${
+                            theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                          }`} />
+                          <span className={`text-sm ${
+                            theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
+                          }`}>{formatDate(issue.updatedAt)}</span>
                         </div>
                       </div>
 
                       <div className="flex items-center space-x-2">
                         <div className={`w-3 h-3 rounded-full ${getStatusColor(issue.status)}`} />
-                        <span className="text-sm text-slate-600">{issue.status}</span>
+                        <span className={`text-sm ${
+                          theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
+                        }`}>{issue.status}</span>
                       </div>
                     </div>
                   </div>

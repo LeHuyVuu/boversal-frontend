@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/constants';
 import { Project, ProjectListResponse } from '@/types/project';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', key: 'dashboard' as const },
@@ -51,6 +52,7 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
+  const { theme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [projectsExpanded, setProjectsExpanded] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -75,15 +77,21 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
 
   return (
     <div
-      className={`bg-white border-r border-slate-200 flex flex-col h-screen transition-all duration-300 
-      ${isCollapsed ? 'w-16' : 'w-52'}`}
+      className={`border-r flex flex-col h-screen transition-all duration-300 ${
+        theme === 'dark'
+          ? 'bg-black/80 border-blue-500/20 backdrop-blur-md'
+          : 'bg-white border-slate-200'
+      } ${isCollapsed ? 'w-16' : 'w-52'}`}
     >
       {/* Logo + Toggle */}
       <div className="flex items-center justify-between m-4">
         {/* Logo */}
         <div
-          className="flex items-center gap-2 cursor-pointer rounded px-2 py-1
-             hover:bg-slate-200 hover:text-slate-900 transition-colors"
+          className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 transition-colors ${
+            theme === 'dark'
+              ? 'hover:bg-blue-900/30 hover:text-cyan-100'
+              : 'hover:bg-slate-200 hover:text-slate-900'
+          }`}
           onClick={() => {
             if (isCollapsed) setIsCollapsed(false);
           }}
@@ -96,17 +104,25 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
             className="flex-shrink-0"
           />
           {!isCollapsed && (
-            <p className="font-bold text-sm text-slate-700">FoundersHub</p>
+            <p className={`font-bold text-sm ${
+              theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+            }`}>B-Board Note</p>
           )}
         </div>
 
         {/* Button toggle */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1 rounded hover:bg-slate-100"
-        >
-          {isCollapsed ? <SidebarClose size={0} /> : <SidebarClose size={18} />}
-        </button>
+        {!isCollapsed && (
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={`p-1 rounded transition-colors ${
+              theme === 'dark'
+                ? 'hover:bg-blue-900/30'
+                : 'hover:bg-slate-100'
+            }`}
+          >
+            <SidebarClose size={18} className={theme === 'dark' ? 'text-cyan-300' : ''} />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -121,12 +137,15 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
                   <Link
                     href={`/workspace/${item.key}`}
                     onClick={() => onSectionChange(item.key)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors flex-1
-                      ${
-                        activeSection === item.key
-                          ? 'bg-sky-300 text-slate-700'
-                          : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
-                      }`}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all flex-1 ${
+                      activeSection === item.key
+                        ? theme === 'dark'
+                          ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/50'
+                          : 'bg-sky-300 text-slate-700'
+                        : theme === 'dark'
+                        ? 'text-cyan-200 hover:text-cyan-50 hover:bg-blue-900/30'
+                        : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
+                    }`}
                   >
                     <item.icon className="w-5 h-5 flex-shrink-0" />
                     {!isCollapsed && <span className="font-medium">{item.label}</span>}
@@ -135,12 +154,16 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
                   {isProjects && !isCollapsed && (
                     <button
                       onClick={() => setProjectsExpanded(!projectsExpanded)}
-                      className="p-2 hover:bg-sky-50 rounded transition-colors"
+                      className={`p-2 rounded transition-colors ${
+                        theme === 'dark'
+                          ? 'hover:bg-blue-900/30'
+                          : 'hover:bg-sky-50'
+                      }`}
                     >
                       {projectsExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-slate-500" />
+                        <ChevronDown className={`w-4 h-4 ${theme === 'dark' ? 'text-cyan-300' : 'text-slate-500'}`} />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-slate-500" />
+                        <ChevronRight className={`w-4 h-4 ${theme === 'dark' ? 'text-cyan-300' : 'text-slate-500'}`} />
                       )}
                     </button>
                   )}
@@ -150,26 +173,34 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
                 {isProjects && projectsExpanded && !isCollapsed && (
                   <div className="ml-8 mt-1 space-y-1">
                     {projectsLoading ? (
-                      <div className="px-3 py-2 text-xs text-slate-400">Loading...</div>
+                      <div className={`px-3 py-2 text-xs ${
+                        theme === 'dark' ? 'text-cyan-400' : 'text-slate-400'
+                      }`}>Loading...</div>
                     ) : projects.length > 0 ? (
                       projects.map((project) => (
                         <Link
                           key={project.id}
                           href={`/workspace/project/${project.id}`}
-                          className="block px-3 py-2 text-sm text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors"
+                          className={`block px-3 py-2 text-sm rounded-lg transition-all ${
+                            theme === 'dark'
+                              ? 'text-cyan-200 hover:text-cyan-50 hover:bg-blue-900/30'
+                              : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
+                          }`}
                         >
                           <div className="flex items-center gap-2">
                             <div className={`w-2 h-2 rounded-full ${
-                              project.status === 'active' ? 'bg-emerald-400' :
+                              project.status === 'active' ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50' :
                               project.status === 'archived' ? 'bg-slate-400' :
-                              'bg-sky-400'
+                              'bg-sky-400 shadow-lg shadow-sky-400/50'
                             }`} />
                             <span className="truncate">{project.name}</span>
                           </div>
                         </Link>
                       ))
                     ) : (
-                      <div className="px-3 py-2 text-xs text-slate-400">No projects</div>
+                      <div className={`px-3 py-2 text-xs ${
+                        theme === 'dark' ? 'text-cyan-400' : 'text-slate-400'
+                      }`}>No projects</div>
                     )}
                   </div>
                 )}

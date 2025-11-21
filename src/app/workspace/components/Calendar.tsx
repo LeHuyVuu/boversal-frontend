@@ -10,8 +10,10 @@ import {
   Target
 } from 'lucide-react';
 import mockCalendarEvents from '@/mocks/mockCalendarEvents.json';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export const Calendar: React.FC = () => {
+  const { theme } = useTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
 
@@ -121,10 +123,18 @@ export const Calendar: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">Calendar</h1>
-            <p className="text-slate-600">Schedule and track important events and deadlines.</p>
+            <h1 className={`text-3xl font-bold mb-2 ${
+              theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+            }`}>Calendar</h1>
+            <p className={theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'}>
+              Schedule and track important events and deadlines.
+            </p>
           </div>
-          <button className="bg-sky-400 hover:bg-sky-500 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
+          <button className={`px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors ${
+            theme === 'dark'
+              ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/50'
+              : 'bg-sky-400 hover:bg-sky-500 text-white'
+          }`}>
             <Plus className="w-4 h-4" />
             <span>New Event</span>
           </button>
@@ -133,17 +143,27 @@ export const Calendar: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Calendar */}
           <div className="lg:col-span-3">
-            <div className="bg-white border border-slate-200 rounded-lg p-6">
+            <div className={`rounded-lg p-6 ${
+              theme === 'dark'
+                ? 'bg-slate-900/60 border border-blue-500/20 backdrop-blur-sm'
+                : 'bg-white border border-slate-200'
+            }`}>
               {/* Calendar Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
-                  <h2 className="text-xl font-semibold text-slate-800">
+                  <h2 className={`text-xl font-semibold ${
+                    theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+                  }`}>
                     {monthNames[currentMonth]} {currentYear}
                   </h2>
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => navigateMonth('prev')}
-                      className="p-2 text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors"
+                      className={`p-2 rounded-lg transition-colors ${
+                        theme === 'dark'
+                          ? 'text-cyan-300 hover:text-cyan-100 hover:bg-blue-900/30'
+                          : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
+                      }`}
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>

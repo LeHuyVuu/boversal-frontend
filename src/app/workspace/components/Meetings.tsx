@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { Video, Calendar, Users, Plus, Clock } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Meeting {
   id: string;
@@ -12,6 +13,7 @@ interface Meeting {
 }
 
 const Meetings: React.FC = () => {
+  const { theme } = useTheme();
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'ongoing' | 'completed'>('all');
 
   const meetings: Meeting[] = [
@@ -87,15 +89,25 @@ const Meetings: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+              theme === 'dark' ? 'bg-gradient-to-r from-blue-600 to-cyan-600' : 'bg-blue-500'
+            }`}>
               <Video className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Meetings</h1>
-              <p className="text-gray-600 text-sm">Your upcoming and past meetings</p>
+              <h1 className={`text-2xl font-bold ${
+                theme === 'dark' ? 'text-cyan-100' : 'text-gray-900'
+              }`}>Meetings</h1>
+              <p className={`text-sm ${
+                theme === 'dark' ? 'text-cyan-400' : 'text-gray-600'
+              }`}>Your upcoming and past meetings</p>
             </div>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium">
+          <button className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium ${
+            theme === 'dark'
+              ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/50'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+          }`}>
             <Plus className="w-4 h-4" />
             Schedule Meeting
           </button>
@@ -107,10 +119,15 @@ const Meetings: React.FC = () => {
             <button
               key={type}
               onClick={() => setFilter(type as 'all' | 'upcoming' | 'ongoing' | 'completed')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${filter === type
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                filter === type
+                  ? theme === 'dark'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-blue-500 shadow-lg shadow-blue-500/50'
+                    : 'bg-blue-600 text-white border-blue-600'
+                  : theme === 'dark'
+                    ? 'bg-slate-900/60 text-cyan-200 border-blue-500/20 hover:bg-blue-900/30'
+                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
@@ -123,10 +140,16 @@ const Meetings: React.FC = () => {
             {filteredMeetings.map((meeting) => (
               <div
                 key={meeting.id}
-                className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition cursor-pointer"
+                className={`rounded-xl p-6 shadow-sm border transition cursor-pointer ${
+                  theme === 'dark'
+                    ? 'bg-slate-900/60 border-blue-500/20 hover:shadow-lg hover:shadow-cyan-500/20 hover:border-cyan-500/50 backdrop-blur-sm'
+                    : 'bg-white border-gray-200 hover:shadow-md'
+                }`}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className={`text-lg font-semibold ${
+                    theme === 'dark' ? 'text-cyan-100' : 'text-gray-900'
+                  }`}>
                     {meeting.title}
                   </h3>
                   <span
@@ -138,7 +161,9 @@ const Meetings: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="space-y-2 text-sm text-gray-600">
+                <div className={`space-y-2 text-sm ${
+                  theme === 'dark' ? 'text-cyan-300' : 'text-gray-600'
+                }`}>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     <span>{meeting.date}</span>
@@ -153,7 +178,9 @@ const Meetings: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="mt-3 text-xs text-gray-500">
+                <p className={`mt-3 text-xs ${
+                  theme === 'dark' ? 'text-cyan-400' : 'text-gray-500'
+                }`}>
                   {meeting.participants.join(', ')}
                 </p>
 
@@ -163,11 +190,19 @@ const Meetings: React.FC = () => {
                       Join Now
                     </button>
                   ) : meeting.status === 'upcoming' ? (
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+                    <button className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}>
                       Join Meeting
                     </button>
                   ) : (
-                    <button className="w-full bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-medium cursor-default">
+                    <button className={`w-full py-2 rounded-lg text-sm font-medium cursor-default ${
+                      theme === 'dark'
+                        ? 'bg-slate-800 text-cyan-400'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
                       View Details
                     </button>
                   )}
@@ -191,3 +226,4 @@ const Meetings: React.FC = () => {
 };
 
 export default Meetings;
+export { Meetings };

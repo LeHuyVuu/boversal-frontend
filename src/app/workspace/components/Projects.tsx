@@ -14,6 +14,7 @@ import {
 import { Project, ProjectListResponse } from '@/types/project';
 import { API_ENDPOINTS } from '@/lib/constants';
 import { apiClient } from '@/lib/api-client';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const formatDate = (dateString?: string | null) => {
   if (!dateString) return '—';
@@ -40,6 +41,7 @@ const getStatusColor = (status: string) => {
 };
 
 export const Projects: React.FC = () => {
+  const { theme } = useTheme();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
