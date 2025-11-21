@@ -1,0 +1,19 @@
+[
+    {
+        "id": 1,
+        "name": "Huỳnh Kim Khang",
+        "email": "khang@gmail.com",
+        "avatar": "https://i.pinimg.com/736x/25/c6/69/25c66950e0f2b20d46b1a8a264b8b4aa.jpg",
+        "dob": "15/02/1997",
+        "role": "Co-founder",
+        "gender": "Female",
+        "phone": "034 8527 548",
+        "address": "Tp Hồ Chí Minh",
+        "bio": "Founder of SnapService, I bring deep expertise in Service and a strong vision for empowering clients through practical legal solutions.",
+        "socials": {
+            "linkedin": "https://www.linkedin.com/in/fake-khang",
+            "twitter": "https://twitter.com/fakekhang",
+            "github": "https://github.com/fakekhang"
+        }
+    }
+]

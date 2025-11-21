@@ -1,0 +1,143 @@
+[
+  {
+    "id": "1",
+    "code": "BUG-001",
+    "title": "Login form validation not working on mobile",
+    "description": "Users are unable to submit the login form on mobile devices due to validation errors not being displayed properly.",
+    "priority": "High",
+    "type": "Bug",
+    "status": "Open",
+    "assignee": {
+      "id": "2",
+      "name": "Marcus Rodriguez",
+      "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "marcus@syncro.com"
+    },
+    "reporter": {
+      "id": "1",
+      "name": "Sarah Chen",
+      "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "sarah@syncro.com"
+    },
+    "createdAt": "2025-01-20T14:30:00Z",
+    "updatedAt": "2025-01-20T14:30:00Z",
+    "labels": [
+      "mobile",
+      "authentication",
+      "urgent"
+    ]
+  },
+  {
+    "id": "2",
+    "code": "FEAT-012",
+    "title": "Add dark mode toggle to user preferences",
+    "description": "Implement a dark mode toggle in the user preferences panel with system preference detection.",
+    "priority": "Medium",
+    "type": "Feature",
+    "status": "In Progress",
+    "assignee": {
+      "id": "4",
+      "name": "Alex Turner",
+      "avatar": "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "alex@syncro.com"
+    },
+    "reporter": {
+      "id": "3",
+      "name": "Emily Watson",
+      "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "emily@syncro.com"
+    },
+    "createdAt": "2025-01-18T10:00:00Z",
+    "updatedAt": "2025-01-20T16:45:00Z",
+    "labels": [
+      "ui",
+      "preferences",
+      "enhancement"
+    ]
+  },
+  {
+    "id": "3",
+    "code": "BUG-002",
+    "title": "Dashboard charts not loading on Safari",
+    "description": "Dashboard analytics charts fail to render properly on Safari browsers, showing blank spaces instead.",
+    "priority": "Critical",
+    "type": "Bug",
+    "status": "Open",
+    "assignee": {
+      "id": "2",
+      "name": "Marcus Rodriguez",
+      "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "marcus@syncro.com"
+    },
+    "reporter": {
+      "id": "5",
+      "name": "Maya Patel",
+      "avatar": "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "maya@syncro.com"
+    },
+    "createdAt": "2025-01-19T09:15:00Z",
+    "updatedAt": "2025-01-20T11:20:00Z",
+    "labels": [
+      "safari",
+      "charts",
+      "critical",
+      "dashboard"
+    ]
+  },
+  {
+    "id": "4",
+    "code": "STORY-008",
+    "title": "User onboarding flow improvements",
+    "description": "Redesign the user onboarding process to improve conversion rates and user experience.",
+    "priority": "Medium",
+    "type": "Story",
+    "status": "Resolved",
+    "assignee": {
+      "id": "3",
+      "name": "Emily Watson",
+      "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "emily@syncro.com"
+    },
+    "reporter": {
+      "id": "1",
+      "name": "Sarah Chen",
+      "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "sarah@syncro.com"
+    },
+    "createdAt": "2025-01-15T13:00:00Z",
+    "updatedAt": "2025-01-19T17:30:00Z",
+    "labels": [
+      "onboarding",
+      "ux",
+      "conversion"
+    ]
+  },
+  {
+    "id": "5",
+    "code": "TASK-045",
+    "title": "Update API documentation",
+    "description": "Update API documentation to reflect recent endpoint changes and new authentication methods.",
+    "priority": "Low",
+    "type": "Task",
+    "status": "Open",
+    "assignee": {
+      "id": "2",
+      "name": "Marcus Rodriguez",
+      "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "marcus@syncro.com"
+    },
+    "reporter": {
+      "id": "2",
+      "name": "Marcus Rodriguez",
+      "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "marcus@syncro.com"
+    },
+    "createdAt": "2025-01-17T08:30:00Z",
+    "updatedAt": "2025-01-17T08:30:00Z",
+    "labels": [
+      "documentation",
+      "api",
+      "maintenance"
+    ]
+  }
+]

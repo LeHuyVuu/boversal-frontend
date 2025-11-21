@@ -1,0 +1,148 @@
+[
+  {
+    "id": "1",
+    "name": "Syncro Mobile App",
+    "description": "Complete mobile application redesign with new features and improved user experience.",
+    "status": "Active",
+    "progress": 75,
+    "team": "Design",
+    "lead": {
+      "id": "1",
+      "name": "Sarah Chen",
+      "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "sarah@syncro.com"
+    },
+    "members": [
+      {
+        "id": "1",
+        "name": "Sarah Chen",
+        "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "sarah@syncro.com"
+      },
+      {
+        "id": "2",
+        "name": "Marcus Rodriguez",
+        "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "marcus@syncro.com"
+      },
+      {
+        "id": "3",
+        "name": "Emily Watson",
+        "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "emily@syncro.com"
+      }
+    ],
+    "createdAt": "2025-01-01T09:00:00Z",
+    "deadline": "2025-02-15T17:00:00Z",
+    "tasksCount": {
+      "total": 24,
+      "completed": 18,
+      "inProgress": 4
+    }
+  },
+  {
+    "id": "2",
+    "name": "Brand Identity Refresh",
+    "description": "Update brand guidelines, logo, and marketing materials across all platforms.",
+    "status": "Active",
+    "progress": 45,
+    "team": "Branding",
+    "lead": {
+      "id": "5",
+      "name": "Maya Patel",
+      "avatar": "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "maya@syncro.com"
+    },
+    "members": [
+      {
+        "id": "5",
+        "name": "Maya Patel",
+        "avatar": "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "maya@syncro.com"
+      },
+      {
+        "id": "4",
+        "name": "Alex Turner",
+        "avatar": "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "alex@syncro.com"
+      }
+    ],
+    "createdAt": "2025-01-10T10:00:00Z",
+    "deadline": "2025-03-01T17:00:00Z",
+    "tasksCount": {
+      "total": 16,
+      "completed": 7,
+      "inProgress": 3
+    }
+  },
+  {
+    "id": "3",
+    "name": "Website Performance Optimization",
+    "description": "Improve website loading times and overall performance metrics.",
+    "status": "Completed",
+    "progress": 100,
+    "team": "UI/UX",
+    "lead": {
+      "id": "2",
+      "name": "Marcus Rodriguez",
+      "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "marcus@syncro.com"
+    },
+    "members": [
+      {
+        "id": "2",
+        "name": "Marcus Rodriguez",
+        "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "marcus@syncro.com"
+      },
+      {
+        "id": "4",
+        "name": "Alex Turner",
+        "avatar": "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "alex@syncro.com"
+      }
+    ],
+    "createdAt": "2024-12-01T09:00:00Z",
+    "deadline": "2025-01-15T17:00:00Z",
+    "tasksCount": {
+      "total": 12,
+      "completed": 12,
+      "inProgress": 0
+    }
+  },
+  {
+    "id": "4",
+    "name": "Marketing Campaign Q1",
+    "description": "Launch comprehensive marketing campaign for Q1 2025 product releases.",
+    "status": "On Hold",
+    "progress": 20,
+    "team": "Marketing",
+    "lead": {
+      "id": "3",
+      "name": "Emily Watson",
+      "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+      "email": "emily@syncro.com"
+    },
+    "members": [
+      {
+        "id": "3",
+        "name": "Emily Watson",
+        "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "emily@syncro.com"
+      },
+      {
+        "id": "5",
+        "name": "Maya Patel",
+        "avatar": "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "maya@syncro.com"
+      }
+    ],
+    "createdAt": "2025-01-05T11:00:00Z",
+    "deadline": "2025-03-31T17:00:00Z",
+    "tasksCount": {
+      "total": 20,
+      "completed": 4,
+      "inProgress": 1
+    }
+  }
+]

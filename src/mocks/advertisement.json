@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "name": "Nike",
+    "images": [
+      "https://i.pinimg.com/736x/25/c6/69/25c66950e0f2b20d46b1a8a264b8b4aa.jpg",
+      "https://i.pinimg.com/736x/25/c6/69/25c66950e0f2b20d46b1a8a264b8b4aa.jpg",
+      "https://i.pinimg.com/736x/25/c6/69/25c66950e0f2b20d46b1a8a264b8b4aa.jpg"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Adidas",
+    "images": [
+      "https://i.pinimg.com/736x/25/c6/69/25c66950e0f2b20d46b1a8a264b8b4aa.jpg",
+      "https://i.pinimg.com/736x/25/c6/69/25c66950e0f2b20d46b1a8a264b8b4aa.jpg",
+      "https://i.pinimg.com/736x/25/c6/69/25c66950e0f2b20d46b1a8a264b8b4aa.jpg"
+    ]
+  }
+  
+]

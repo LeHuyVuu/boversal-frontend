@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "name": "Design",
+    "color": "bg-purple-600"
+  },
+  {
+    "id": "2",
+    "name": "UI/UX",
+    "color": "bg-blue-600"
+  },
+  {
+    "id": "3",
+    "name": "Illustrators",
+    "color": "bg-pink-600"
+  },
+  {
+    "id": "4",
+    "name": "Branding",
+    "color": "bg-orange-600"
+  },
+  {
+    "id": "5",
+    "name": "Marketing",
+    "color": "bg-green-600"
+  },
+  {
+    "id": "6",
+    "name": "Sales",
+    "color": "bg-red-600"
+  }
+]

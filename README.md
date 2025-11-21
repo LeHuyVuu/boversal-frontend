@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Boversal Frontend
+
+A modern workspace management application built with Next.js 15, React 19, and TypeScript.
+
+## Features
+
+- 📊 **Dashboard**: Real-time statistics and overview
+- 📁 **Projects**: Project management with status tracking
+- ✅ **Tasks**: Kanban board with drag-and-drop functionality
+- 🐛 **Issues**: Issue tracking and resolution
+- 📅 **Calendar**: Event scheduling and management
+- 💾 **Storage**: Document management
+- 👥 **Meetings**: Meeting coordination
+- 📄 **Documents**: Document organization
+
+## Tech Stack
+
+- **Framework**: Next.js 15.5.3 with App Router
+- **UI**: React 19.1.0 + TailwindCSS 4.0
+- **Language**: TypeScript 5.x (strict mode)
+- **Drag & Drop**: @dnd-kit
+- **Icons**: Lucide React
+- **Build Tool**: Turbopack
+
+## Project Structure
+
+```
+src/
+├── app/                  # Next.js App Router pages
+│   ├── workspace/        # Main workspace routes
+│   │   ├── components/   # Workspace-specific components
+│   │   ├── dashboard/    # Dashboard page
+│   │   ├── projects/     # Projects page
+│   │   ├── calendar/     # Calendar page
+│   │   └── ...
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Landing page
+├── types/                # TypeScript type definitions
+├── mocks/                # Mock data for development
+└── lib/                  # Utilities and constants
+    ├── utils.ts          # Helper functions
+    └── constants.ts      # API endpoints
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ 
+- npm/yarn/pnpm
+
+### Installation
 
 ```bash
+# Clone repository
+git clone <repository-url>
+
+# Install dependencies
+npm install
+
+# Copy environment variables
+cp .env.example .env.local
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint errors automatically
+- `npm run type-check` - Run TypeScript type checking
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+See `.env.example` for required environment variables.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Integration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+API endpoints are centralized in `src/lib/constants.ts`:
+- Base URL: `https://foundershub.nducky.id.vn/api`
+- Endpoints: projects, tasks, issues, users
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Create a feature branch
+2. Make your changes
+3. Run `npm run type-check` and `npm run lint`
+4. Submit a pull request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+Private project - All rights reserved

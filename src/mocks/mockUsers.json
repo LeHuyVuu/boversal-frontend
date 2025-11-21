@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "name": "Sarah Chen",
+    "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+    "email": "sarah@syncro.com"
+  },
+  {
+    "id": "2",
+    "name": "Marcus Rodriguez",
+    "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+    "email": "marcus@syncro.com"
+  },
+  {
+    "id": "3",
+    "name": "Emily Watson",
+    "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+    "email": "emily@syncro.com"
+  },
+  {
+    "id": "4",
+    "name": "Alex Turner",
+    "avatar": "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+    "email": "alex@syncro.com"
+  },
+  {
+    "id": "5",
+    "name": "Maya Patel",
+    "avatar": "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+    "email": "maya@syncro.com"
+  }
+]

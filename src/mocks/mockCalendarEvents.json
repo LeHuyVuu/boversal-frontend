@@ -1,0 +1,164 @@
+[
+  {
+    "id": "1",
+    "title": "Sprint Planning Meeting",
+    "description": "Plan tasks and goals for the upcoming sprint cycle.",
+    "type": "meeting",
+    "date": "2025-01-22",
+    "startTime": "09:00",
+    "endTime": "10:30",
+    "attendees": [
+      {
+        "id": "1",
+        "name": "Sarah Chen",
+        "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "sarah@syncro.com"
+      },
+      {
+        "id": "2",
+        "name": "Marcus Rodriguez",
+        "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "marcus@syncro.com"
+      },
+      {
+        "id": "3",
+        "name": "Emily Watson",
+        "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "emily@syncro.com"
+      }
+    ],
+    "project": "Syncro Mobile App"
+  },
+  {
+    "id": "2",
+    "title": "Design Review Session",
+    "description": "Review and approve new design mockups for the mobile app.",
+    "type": "review",
+    "date": "2025-01-23",
+    "startTime": "14:00",
+    "endTime": "15:30",
+    "attendees": [
+      {
+        "id": "1",
+        "name": "Sarah Chen",
+        "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "sarah@syncro.com"
+      },
+      {
+        "id": "3",
+        "name": "Emily Watson",
+        "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "emily@syncro.com"
+      },
+      {
+        "id": "5",
+        "name": "Maya Patel",
+        "avatar": "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "maya@syncro.com"
+      }
+    ],
+    "project": "Syncro Mobile App"
+  },
+  {
+    "id": "3",
+    "title": "Project Deadline",
+    "description": "Final deadline for Brand Identity Refresh project deliverables.",
+    "type": "deadline",
+    "date": "2025-01-25",
+    "startTime": "17:00",
+    "endTime": "17:00",
+    "attendees": [
+      {
+        "id": "5",
+        "name": "Maya Patel",
+        "avatar": "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "maya@syncro.com"
+      }
+    ],
+    "project": "Brand Identity Refresh"
+  },
+  {
+    "id": "4",
+    "title": "Team Standup",
+    "description": "Daily team standup to discuss progress and blockers.",
+    "type": "meeting",
+    "date": "2025-01-21",
+    "startTime": "09:30",
+    "endTime": "10:00",
+    "attendees": [
+      {
+        "id": "1",
+        "name": "Sarah Chen",
+        "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "sarah@syncro.com"
+      },
+      {
+        "id": "2",
+        "name": "Marcus Rodriguez",
+        "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "marcus@syncro.com"
+      },
+      {
+        "id": "3",
+        "name": "Emily Watson",
+        "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "emily@syncro.com"
+      },
+      {
+        "id": "4",
+        "name": "Alex Turner",
+        "avatar": "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "alex@syncro.com"
+      }
+    ],
+    "project": "Syncro Mobile App"
+  },
+  {
+    "id": "5",
+    "title": "Milestone: Beta Release",
+    "description": "Beta version release milestone for the mobile application.",
+    "type": "milestone",
+    "date": "2025-01-28",
+    "startTime": "12:00",
+    "endTime": "12:00",
+    "attendees": [
+      {
+        "id": "1",
+        "name": "Sarah Chen",
+        "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "sarah@syncro.com"
+      },
+      {
+        "id": "2",
+        "name": "Marcus Rodriguez",
+        "avatar": "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "marcus@syncro.com"
+      }
+    ],
+    "project": "Syncro Mobile App"
+  },
+  {
+    "id": "6",
+    "title": "Client Presentation",
+    "description": "Present project progress and upcoming features to stakeholders.",
+    "type": "meeting",
+    "date": "2025-01-24",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "attendees": [
+      {
+        "id": "1",
+        "name": "Sarah Chen",
+        "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "sarah@syncro.com"
+      },
+      {
+        "id": "3",
+        "name": "Emily Watson",
+        "avatar": "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+        "email": "emily@syncro.com"
+      }
+    ],
+    "project": "Brand Identity Refresh"
+  }
+]
