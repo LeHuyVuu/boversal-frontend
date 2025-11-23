@@ -1,6 +1,6 @@
 'use client';
-import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Loader2 } from 'lucide-react';
 import {
   DndContext,
   PointerSensor,
@@ -8,7 +8,8 @@ import {
   useSensors,
   DragEndEvent,
   DragStartEvent,
-  closestCenter,
+  DragOverEvent,
+  rectIntersection,
   useDroppable,
   DragOverlay,
 } from '@dnd-kit/core';
@@ -18,99 +19,64 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task } from '@/types/task';
+import { taskService, Task } from '@/services/taskService';
 import { TaskCard } from '@/app/workspace/components/TaskCard';
 import { TaskDetail } from './TaskDetail';
-
-const mockTasks: Task[] = [
-  {
-    id: '1',
-    projectId: {
-      id: 'p1',
-      name: 'Project Alpha',
-      description: 'Demo project',
-      status: 'active',
-      startDate: null,
-      endDate: null,
-      progress: 50,
-    },
-    name: 'Design UI',
-    description: 'Create wireframes and mockups',
-    status: 'To Do',
-    priority: 'Medium',
-    dueDate: '2025-10-01T00:00:00.000Z',
-    createdBy: {
-      id: 'u1',
-      email: 'alice@example.com',
-      fullName: 'Alice Johnson',
-      avatar: 'https://i.pravatar.cc/40?img=1',
-    },
-  },
-  {
-    id: '2',
-    projectId: {
-      id: 'p1',
-      name: 'Project Alpha',
-      description: 'Demo project',
-      status: 'active',
-      startDate: null,
-      endDate: null,
-      progress: 50,
-    },
-    name: 'Implement API',
-    description: 'Build REST API for tasks',
-    status: 'In Progress',
-    priority: 'High',
-    dueDate: '2025-10-05T00:00:00.000Z',
-    createdBy: {
-      id: 'u2',
-      email: 'bob@example.com',
-      fullName: 'Bob Smith',
-      avatar: 'https://i.pravatar.cc/40?img=2',
-    },
-  },
-  {
-    id: '3',
-    projectId: {
-      id: 'p2',
-      name: 'Project Beta',
-      description: 'Another demo',
-      status: 'active',
-      startDate: null,
-      endDate: null,
-      progress: 80,
-    },
-    name: 'Write Tests',
-    description: 'Unit and integration tests',
-    status: 'Review',
-    priority: 'Low',
-    dueDate: '2025-10-10T00:00:00.000Z',
-    createdBy: {
-      id: 'u3',
-      email: 'charlie@example.com',
-      fullName: 'Charlie Nguyen',
-      avatar: 'https://i.pravatar.cc/40?img=3',
-    },
-  },
-];
+import { useTheme } from '@/contexts/ThemeContext';
 
 const columns = [
-  { id: 'To Do', label: 'To Do', color: 'border-slate-300' },
-  { id: 'In Progress', label: 'In Progress', color: 'border-sky-300' },
-  { id: 'Review', label: 'Review', color: 'border-yellow-300' },
-  { id: 'Done', label: 'Done', color: 'border-emerald-300' },
+  { id: 6, label: 'To Do', color: 'border-slate-500' },
+  { id: 7, label: 'In Progress', color: 'border-cyan-500' },
+  { id: 9, label: 'Review', color: 'border-amber-500' },
+  { id: 10, label: 'Done', color: 'border-emerald-500' },
 ] as const;
 
-export const KanbanBoard: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
-  const [currentColumn, setCurrentColumn] = useState<string | null>(null);
+interface KanbanBoardProps {
+  projectId?: number;
+}
 
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
+  const { theme } = useTheme();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentColumn, setCurrentColumn] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [overId, setOverId] = useState<number | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
+    useSensor(PointerSensor, { 
+      activationConstraint: { 
+        distance: 5,
+      } 
+    })
   );
+
+  // Fetch tasks
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = projectId 
+          ? await taskService.getTasks(1, 100, projectId)
+          : await taskService.getMyTasks(1, 100);
+        
+        if (response.success) {
+          setTasks(response.data);
+        } else {
+          setError(response.message || 'Failed to load tasks');
+        }
+      } catch (e: any) {
+        setError(e?.message || 'Failed to load tasks');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, [projectId]);
 
   const taskById = React.useMemo(
     () => new Map((tasks ?? []).map((t) => [t.id, t])),
@@ -118,115 +84,295 @@ export const KanbanBoard: React.FC = () => {
   );
 
   const handleDragStart = (e: DragStartEvent) => {
-    const task = taskById.get(e.active.id as string);
+    const task = taskById.get(e.active.id as number);
     if (task) setActiveTask(task);
   };
 
-  const handleDragEnd = (e: DragEndEvent) => {
+  const handleDragOver = (e: DragOverEvent) => {
+    const { over } = e;
+    if (over) {
+      setOverId(over.id as number);
+    }
+  };
+
+  const handleDragEnd = async (e: DragEndEvent) => {
     const { active, over } = e;
     setActiveTask(null);
+    setOverId(null);
+    
     if (!over) return;
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
+    const taskId = active.id as number;
+    const targetId = over.id as number;
+    const activeTaskData = taskById.get(taskId);
+    
+    if (!activeTaskData) return;
 
-    const isColumn = columns.some((c) => c.id === overId);
+    // Check if dropped on column or another task
+    const isColumn = columns.some((c) => c.id === targetId);
+    const overTask = taskById.get(targetId);
+    
+    let targetStatusId: number;
+    let targetIndex: number;
+
     if (isColumn) {
-      const t = taskById.get(activeId);
-      if (t && t.status !== overId) {
-        setTasks((prev) =>
-          prev.map((task) =>
-            task.id === activeId ? { ...task, status: overId } : task
-          )
-        );
-        return;
+      // Dropped on column - add to end
+      targetStatusId = targetId;
+      const columnTasks = tasks
+        .filter((t) => t.statusId === targetStatusId && t.id !== taskId)
+        .sort((a, b) => a.orderIndex - b.orderIndex);
+      targetIndex = columnTasks.length;
+    } else if (overTask) {
+      // Dropped on task - insert at that position
+      targetStatusId = overTask.statusId;
+      const columnTasks = tasks
+        .filter((t) => t.statusId === targetStatusId)
+        .sort((a, b) => a.orderIndex - b.orderIndex);
+      targetIndex = columnTasks.findIndex((t) => t.id === targetId);
+    } else {
+      return;
+    }
+
+    // Same position - do nothing
+    if (targetStatusId === activeTaskData.statusId) {
+      const currentColumnTasks = tasks
+        .filter((t) => t.statusId === targetStatusId)
+        .sort((a, b) => a.orderIndex - b.orderIndex);
+      const currentIndex = currentColumnTasks.findIndex((t) => t.id === taskId);
+      
+      if (currentIndex === targetIndex) return;
+    }
+
+    // Calculate new orderIndex
+    const targetColumnTasks = tasks
+      .filter((t) => t.statusId === targetStatusId && t.id !== taskId)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+
+    let newOrderIndex: number;
+    
+    if (targetColumnTasks.length === 0) {
+      newOrderIndex = 1000;
+    } else if (targetIndex === 0) {
+      // Insert at beginning
+      newOrderIndex = Math.max(0, targetColumnTasks[0].orderIndex - 1000);
+    } else if (targetIndex >= targetColumnTasks.length) {
+      // Insert at end
+      newOrderIndex = targetColumnTasks[targetColumnTasks.length - 1].orderIndex + 1000;
+    } else {
+      // Insert in middle
+      const prevTask = targetColumnTasks[targetIndex - 1];
+      const nextTask = targetColumnTasks[targetIndex];
+      newOrderIndex = Math.floor((prevTask.orderIndex + nextTask.orderIndex) / 2);
+      
+      // If gap too small, add more space
+      if (nextTask.orderIndex - prevTask.orderIndex < 2) {
+        newOrderIndex = prevTask.orderIndex + 1;
       }
     }
 
-    const overTask = taskById.get(overId);
-    const activeTaskData = taskById.get(activeId);
-    if (overTask && activeTaskData && overTask.status !== activeTaskData.status) {
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === activeId ? { ...task, status: overTask.status } : task
-        )
-      );
+    // Optimistic update with re-sort
+    const updatedTasks = tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, statusId: targetStatusId, orderIndex: newOrderIndex }
+        : t
+    ).sort((a, b) => {
+      if (a.statusId !== b.statusId) return a.statusId - b.statusId;
+      return a.orderIndex - b.orderIndex;
+    });
+
+    setTasks(updatedTasks);
+
+    // API call
+    try {
+      const payload: any = { orderIndex: newOrderIndex };
+      if (targetStatusId !== activeTaskData.statusId) {
+        payload.statusId = targetStatusId;
+      }
+      
+      await taskService.patchTask(taskId, payload);
+    } catch (error) {
+      // Revert on error
+      setTasks(tasks);
+      console.error('Failed to update task:', error);
     }
   };
 
-  const statusMap: Record<string, string> = {
-    'To Do': 'To Do',
-    'In Progress': 'In Progress',
-    Review: 'Review',
-    Done: 'Done',
-  };
+  if (loading) {
+    return (
+      <div className={`flex-1 flex items-center justify-center ${
+        theme === 'dark' ? 'bg-black' : 'bg-slate-50'
+      }`}>
+        <div className="text-center">
+          <Loader2 className={`w-12 h-12 animate-spin mx-auto mb-4 ${
+            theme === 'dark' ? 'text-cyan-400' : 'text-sky-500'
+          }`} />
+          <p className={theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'}>
+            Loading tasks...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleAddTask = (taskData: Partial<Task>) => {
-    if (!currentColumn) return;
-    const newTask: Task = {
-      id: Date.now().toString(),
-      name: taskData.name || 'New Task',
-      description: taskData.description || '',
-      priority: taskData.priority || 'Medium',
-      dueDate: taskData.dueDate || new Date().toISOString(),
-      ...taskData,
-      projectId: {
-        id: 'p-new',
-        name: 'Mock Project',
-        description: '',
-        status: 'active',
-        startDate: null,
-        endDate: null,
-        progress: 0,
-      },
-      createdBy: {
-        id: 'u-new',
-        email: 'mock@example.com',
-        fullName: 'Mock User',
-        avatar: 'https://i.pravatar.cc/40?img=4',
-      },
-      status: statusMap[currentColumn],
-    };
-    setTasks((prev) => [...prev, newTask]);
-  };
-
-  const handleSelectTask = (task: Task) => {
-    setSelectedTask(task);
-  };
+  if (error) {
+    return (
+      <div className={`flex-1 flex items-center justify-center ${
+        theme === 'dark' ? 'bg-black' : 'bg-slate-50'
+      }`}>
+        <div className="text-center">
+          <p className={`text-lg mb-2 ${
+            theme === 'dark' ? 'text-red-400' : 'text-red-600'
+          }`}>Error loading tasks</p>
+          <p className={theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'}>
+            {error}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex-1 p-6">
+    <div className={`flex-1 p-3 sm:p-4 lg:p-6 ${
+      theme === 'dark' ? 'bg-black' : 'bg-slate-50'
+    }`}>
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={rectIntersection}
         onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
-        onDragCancel={() => setActiveTask(null)}
+        onDragCancel={() => {
+          setActiveTask(null);
+          setOverId(null);
+        }}
       >
-        <div className="grid grid-cols-4 gap-6 h-full">
+        {/* Mobile: Single column scroll */}
+        <div className="block lg:hidden">
+          <div className="flex flex-col gap-4">
+            {columns.map((column) => {
+              const columnTasks = (tasks ?? [])
+                .filter((task) => task.statusId === column.id)
+                .sort((a, b) => a.orderIndex - b.orderIndex);
+
+              return (
+                <div key={column.id} className="flex flex-col w-full">
+                  <div
+                    className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all ${
+                      theme === 'dark'
+                        ? 'bg-slate-900/60 border-b border-blue-500/20'
+                        : 'bg-white border-b border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <h2 className={`font-semibold text-sm ${
+                        theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+                      }`}>
+                        {column.label}
+                      </h2>
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          theme === 'dark'
+                            ? 'bg-blue-500/20 text-cyan-300 border border-cyan-500/30'
+                            : 'bg-slate-100 text-slate-600 border border-slate-200'
+                        }`}>
+                          {columnTasks.length}
+                        </span>
+                        <button
+                          onClick={() => {
+                            setCurrentColumn(column.id);
+                          }}
+                          className={`p-1.5 rounded-lg transition-all ${
+                            theme === 'dark'
+                              ? 'text-cyan-400 hover:text-cyan-300 hover:bg-blue-900/30'
+                              : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50'
+                          }`}
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <ColumnDroppable id={column.id} isOver={overId === column.id}>
+                    <SortableContext
+                      items={columnTasks.map((t) => t.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className={`flex-1 rounded-b-xl p-3 space-y-2.5 min-h-[300px] border border-t-0 ${
+                        theme === 'dark'
+                          ? 'bg-slate-900/30 border-blue-500/20'
+                          : 'bg-white border-slate-200'
+                      }`}>
+                        {columnTasks.map((task) => (
+                          <SortableTask
+                            key={task.id}
+                            task={task}
+                            onClick={() => setSelectedTask(task)}
+                          />
+                        ))}
+                        {columnTasks.length === 0 && (
+                          <div className={`flex items-center justify-center h-full min-h-[250px] border-2 border-dashed rounded-lg transition-all ${
+                            overId === column.id
+                              ? theme === 'dark'
+                                ? 'border-cyan-400 bg-cyan-500/10'
+                                : 'border-sky-400 bg-sky-100/50'
+                              : theme === 'dark' 
+                                ? 'border-blue-500/20 bg-slate-900/20'
+                                : 'border-slate-200 bg-slate-50'
+                          }`}>
+                            <p className={theme === 'dark' ? 'text-xs text-cyan-400/60' : 'text-xs text-slate-400'}>
+                              {overId === column.id ? 'Drop here' : 'No tasks'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </SortableContext>
+                  </ColumnDroppable>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Desktop: Responsive grid without horizontal scroll */}
+        <div className="hidden lg:grid lg:grid-cols-4 gap-3 xl:gap-4">
           {columns.map((column) => {
-            const columnTasks = (tasks ?? []).filter(
-              (task) => task.status === column.id
-            );
+            const columnTasks = (tasks ?? [])
+              .filter((task) => task.statusId === column.id)
+              .sort((a, b) => a.orderIndex - b.orderIndex);
 
             return (
               <div key={column.id} className="flex flex-col">
                 <div
-                  className={`border-t-3 ${column.color} bg-sky-50 rounded-t-lg px-4 py-3`}
+                  className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all ${
+                    theme === 'dark'
+                      ? 'bg-slate-900/60 border-b border-blue-500/20'
+                      : 'bg-white border-b border-slate-200'
+                  }`}
                 >
                   <div className="flex items-center justify-between">
-                    <h2 className="font-semibold text-slate-700 text-sm">
+                    <h2 className={`font-semibold text-sm ${
+                      theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+                    }`}>
                       {column.label}
                     </h2>
                     <div className="flex items-center space-x-2">
-                      <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-full">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        theme === 'dark'
+                          ? 'bg-blue-500/20 text-cyan-300 border border-cyan-500/30'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      }`}>
                         {columnTasks.length}
                       </span>
                       <button
                         onClick={() => {
                           setCurrentColumn(column.id);
                         }}
-                        className="text-slate-500 hover:text-sky-600"
+                        className={`p-1.5 rounded-lg transition-all ${
+                          theme === 'dark'
+                            ? 'text-cyan-400 hover:text-cyan-300 hover:bg-blue-900/30'
+                            : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50'
+                        }`}
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -234,22 +380,36 @@ export const KanbanBoard: React.FC = () => {
                   </div>
                 </div>
 
-                <ColumnDroppable id={column.id}>
+                <ColumnDroppable id={column.id} isOver={overId === column.id}>
                   <SortableContext
                     items={columnTasks.map((t) => t.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className="flex-1 bg-white rounded-b-lg p-4 space-y-3 min-h-96 border border-t-0 border-slate-200 overflow-hidden">
+                    <div className={`flex-1 rounded-b-xl p-3 space-y-2.5 min-h-[400px] max-h-[calc(100vh-300px)] border border-t-0 overflow-y-auto ${
+                      theme === 'dark'
+                        ? 'bg-slate-900/30 border-blue-500/20 scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-slate-800/50'
+                        : 'bg-white border-slate-200 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'
+                    }`}>
                       {columnTasks.map((task) => (
                         <SortableTask
                           key={task.id}
                           task={task}
-                          onClick={() => handleSelectTask(task)}
+                          onClick={() => setSelectedTask(task)}
                         />
                       ))}
                       {columnTasks.length === 0 && (
-                        <div className="flex items-center justify-center h-32 border-2 border-dashed border-slate-200 rounded-lg">
-                          <p className="text-slate-500 text-sm">No tasks</p>
+                        <div className={`flex items-center justify-center h-full min-h-[350px] border-2 border-dashed rounded-lg transition-all ${
+                          overId === column.id
+                            ? theme === 'dark'
+                              ? 'border-cyan-400 bg-cyan-500/10'
+                              : 'border-sky-400 bg-sky-100/50'
+                            : theme === 'dark' 
+                              ? 'border-blue-500/20 bg-slate-900/20'
+                              : 'border-slate-200 bg-slate-50'
+                        }`}>
+                          <p className={theme === 'dark' ? 'text-sm text-cyan-400/60' : 'text-sm text-slate-400'}>
+                            {overId === column.id ? 'Drop here' : 'No tasks'}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -262,7 +422,9 @@ export const KanbanBoard: React.FC = () => {
 
         <DragOverlay>
           {activeTask ? (
-            <div className="shadow-lg rounded-lg bg-white">
+            <div className={`shadow-2xl rounded-lg ${
+              theme === 'dark' ? 'bg-slate-800' : 'bg-white'
+            }`}>
               <TaskCard task={activeTask} onClick={() => {}} />
             </div>
           ) : null}
@@ -276,15 +438,25 @@ export const KanbanBoard: React.FC = () => {
   );
 };
 
-const ColumnDroppable: React.FC<React.PropsWithChildren<{ id: string }>> = ({
+const ColumnDroppable: React.FC<React.PropsWithChildren<{ id: number; isOver?: boolean }>> = ({
   id,
   children,
+  isOver: isOverProp,
 }) => {
-  const { setNodeRef, isOver } = useDroppable({ id });
+  const { setNodeRef, isOver: isOverDroppable } = useDroppable({ id });
+  const { theme } = useTheme();
+  const isOver = isOverProp || isOverDroppable;
+  
   return (
     <div
       ref={setNodeRef}
-      className={isOver ? 'ring-2 ring-sky-300/50 rounded-b-lg' : ''}
+      className={`transition-all ${
+        isOver 
+          ? theme === 'dark'
+            ? 'ring-2 ring-cyan-400/70 rounded-b-xl bg-cyan-500/5' 
+            : 'ring-2 ring-sky-400/70 rounded-b-xl bg-sky-50/80'
+          : ''
+      }`}
     >
       {children}
     </div>
@@ -301,11 +473,14 @@ const SortableTask: React.FC<{ task: Task; onClick: () => void }> = ({
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition: transition || 'transform 200ms cubic-bezier(0.2, 0, 0, 1)',
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.4 : 1,
     cursor: isDragging ? 'grabbing' : 'grab',
-    borderRadius: '0.5rem',
+    borderRadius: '0.75rem',
     zIndex: isDragging ? 50 : 'auto',
-    background: 'white',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    msUserSelect: 'none',
   };
 
   return (
@@ -314,9 +489,11 @@ const SortableTask: React.FC<{ task: Task; onClick: () => void }> = ({
       style={style}
       {...attributes}
       {...listeners}
-      onClick={onClick}
+      className={isDragging ? 'shadow-2xl ring-2 ring-cyan-400' : ''}
     >
-      <TaskCard task={task} onClick={onClick} />
+      <div onClick={onClick} style={{ pointerEvents: isDragging ? 'none' : 'auto' }}>
+        <TaskCard task={task} onClick={onClick} />
+      </div>
     </div>
   );
 };

@@ -8,17 +8,14 @@ import {
   Calendar,
   Users,
   Target,
-  Clock,
   ExternalLink
 } from 'lucide-react';
-import { Project, ProjectListResponse } from '@/types/project';
-import { API_ENDPOINTS } from '@/lib/constants';
-import { apiClient } from '@/lib/api-client';
 import { useTheme } from '@/contexts/ThemeContext';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { AnimatedButton } from '@/components/AnimatedButton';
 import { CardSkeleton } from '@/components/LoadingSkeleton';
 import { useDebounce } from '@/hooks/useDebounce';
+import { projectService, Project as ApiProject } from '@/services/projectService';
 
 const formatDate = (dateString?: string | null) => {
   if (!dateString) return '—';
@@ -31,25 +28,27 @@ const formatDate = (dateString?: string | null) => {
   });
 };
 
-const getStatusColor = (status: string, isDark: boolean) => {
-  switch (status.toLowerCase()) {
-    case 'active':
+const getStatusColor = (statusId: number, isDark: boolean) => {
+  switch (statusId) {
+    case 1: // Active
       return isDark ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border-emerald-200';
-    case 'archived':
-      return isDark ? 'bg-slate-500/20 text-slate-400 border-slate-500/30' : 'bg-slate-100 text-slate-600 border-slate-200';
-    case 'completed':
+    case 2: // Completed
       return isDark ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-blue-100 text-blue-700 border-blue-200';
-    default:
+    case 3: // On Hold
       return isDark ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-amber-100 text-amber-700 border-amber-200';
+    case 4: // Cancelled
+      return isDark ? 'bg-slate-500/20 text-slate-400 border-slate-500/30' : 'bg-slate-100 text-slate-600 border-slate-200';
+    default:
+      return isDark ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 'bg-sky-100 text-sky-700 border-sky-200';
   }
 };
 
-const ProjectCard = React.memo<{ project: Project; index: number }>(({ project, index }) => {
+const ProjectCard = React.memo<{ project: ApiProject; index: number }>(({ project, index }) => {
   const { theme } = useTheme();
   
   return (
     <AnimatedCard
-      delay={index * 0.05}
+      delay={0}
       className={`rounded-xl p-6 border transition-all ${
         theme === 'dark'
           ? 'bg-slate-900/60 border-blue-500/20 hover:border-blue-500/40'
@@ -61,19 +60,16 @@ const ProjectCard = React.memo<{ project: Project; index: number }>(({ project, 
           <div className="flex items-center gap-3 mb-2">
             <h3 className={`text-lg font-semibold ${
               theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-            }`}>{project.name}</h3>
+            }`}>{project.projectName}</h3>
             <span className={`px-3 py-1 rounded-full text-xs font-medium border ${
-              getStatusColor(project.status, theme === 'dark')
+              getStatusColor(project.statusId, theme === 'dark')
             }`}>
-              {project.status}
+              {project.statusName || 'Active'}
             </span>
           </div>
-          <p className={`text-sm ${
-            theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
-          }`}>{project.shortIntro}</p>
         </div>
         <Link
-          href={`/workspace/project/${project.id}`}
+          href={`/workspace/project/${project.projectId}`}
           className={`p-2 rounded-lg transition-all ${
             theme === 'dark'
               ? 'hover:bg-blue-900/30 text-cyan-400'
@@ -90,9 +86,9 @@ const ProjectCard = React.memo<{ project: Project; index: number }>(({ project, 
         {project.description}
       </p>
 
-      <div className="flex items-center justify-between pt-4 border-t ${
+      <div className={`flex items-center justify-between pt-4 border-t ${
         theme === 'dark' ? 'border-blue-500/20' : 'border-slate-200'
-      }">
+      }`}>
         <div className="flex items-center gap-4 text-sm">
           <div className={`flex items-center gap-1 ${
             theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
@@ -104,27 +100,14 @@ const ProjectCard = React.memo<{ project: Project; index: number }>(({ project, 
             theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
           }`}>
             <Users className="w-4 h-4" />
-            <span>{project.members?.length || 0}</span>
+            <span>{project.memberCount || 0}</span>
           </div>
         </div>
         <div className={`text-sm font-medium ${
           theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
         }`}>
-          {project.progress}% complete
+          {project.taskCount || 0} tasks
         </div>
-      </div>
-
-      <div className={`mt-3 w-full rounded-full h-2 overflow-hidden ${
-        theme === 'dark' ? 'bg-slate-800' : 'bg-slate-200'
-      }`}>
-        <div
-          className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-700"
-          style={{ 
-            width: `${project.progress}%`,
-            backgroundSize: '200% 100%',
-            animation: 'gradient-shift 3s ease infinite'
-          }}
-        />
       </div>
     </AnimatedCard>
   );
@@ -134,26 +117,33 @@ ProjectCard.displayName = 'ProjectCard';
 
 export const Projects = React.memo(() => {
   const { theme } = useTheme();
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ApiProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 12;
 
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'archived' | 'completed'>('all');
+  const [statusFilter, setStatusFilter] = useState<number | 'all'>('all');
 
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.get<ProjectListResponse>(API_ENDPOINTS.PROJECTS);
+        setError(null);
+        const response = await projectService.getProjects(pageNumber, pageSize, debouncedSearch);
+        
         if (mounted && response.success) {
           setProjects(response.data);
+          setTotalPages(response.totalPages || 1);
         }
-      } catch (e: unknown) {
-        const error = e as Error;
-        if (mounted) setError(error?.message || 'Failed to load projects');
+      } catch (e: any) {
+        if (mounted) {
+          setError(e?.message || 'Failed to load projects');
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -162,18 +152,14 @@ export const Projects = React.memo(() => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [pageNumber, debouncedSearch]);
 
   const filteredProjects = useMemo(() => {
     return projects.filter((p) => {
-      const matchesSearch =
-        p.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        p.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        p.shortIntro.toLowerCase().includes(debouncedSearch.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || p.status.toLowerCase() === statusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesStatus = statusFilter === 'all' || p.statusId === statusFilter;
+      return matchesStatus;
     });
-  }, [projects, debouncedSearch, statusFilter]);
+  }, [projects, statusFilter]);
 
   return (
     <div className="flex-1 p-6 overflow-y-auto scrollbar-thin gpu-accelerated">
@@ -222,7 +208,7 @@ export const Projects = React.memo(() => {
             }`} />
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'archived' | 'completed')}
+              onChange={(e) => setStatusFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
               className={`rounded-xl px-4 py-2.5 text-sm transition-all focus-ring ${
                 theme === 'dark'
                   ? 'bg-slate-900/80 border border-blue-500/30 text-cyan-100 focus:border-cyan-400'
@@ -230,9 +216,10 @@ export const Projects = React.memo(() => {
               } focus:outline-none`}
             >
               <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-              <option value="completed">Completed</option>
+              <option value="1">Active</option>
+              <option value="2">Completed</option>
+              <option value="3">On Hold</option>
+              <option value="4">Cancelled</option>
             </select>
           </div>
         </div>
@@ -265,11 +252,46 @@ export const Projects = React.memo(() => {
         {!loading && !error && (
           <>
             {filteredProjects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProjects.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProjects.map((project, index) => (
+                    <ProjectCard key={project.projectId} project={project} index={index} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8">
+                    <button
+                      onClick={() => setPageNumber(Math.max(1, pageNumber - 1))}
+                      disabled={pageNumber === 1}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                        theme === 'dark'
+                          ? 'bg-slate-900/80 text-cyan-100 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed border border-blue-500/30'
+                          : 'bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-300'
+                      }`}
+                    >
+                      Previous
+                    </button>
+                    <span className={`px-4 py-2 ${
+                      theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+                    }`}>
+                      Page {pageNumber} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPageNumber(Math.min(totalPages, pageNumber + 1))}
+                      disabled={pageNumber === totalPages}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                        theme === 'dark'
+                          ? 'bg-slate-900/80 text-cyan-100 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed border border-blue-500/30'
+                          : 'bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-300'
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className={`text-center py-16 rounded-xl ${
                 theme === 'dark' ? 'bg-slate-900/60 border border-blue-500/20' : 'bg-white border border-slate-200'

@@ -15,9 +15,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { apiClient } from '@/lib/api-client';
-import { API_ENDPOINTS } from '@/lib/constants';
-import { Project, ProjectListResponse } from '@/types/project';
+import { projectService, Project } from '@/services/projectService';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const menuItems = [
@@ -61,21 +59,26 @@ export const Sidebar = ({ activeSection, onSectionChange, isMobileMenuOpen, setI
   const [projectsLoading, setProjectsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setProjectsLoading(true);
-        const response = await apiClient.get<ProjectListResponse>(API_ENDPOINTS.PROJECTS);
-        if (response.success) {
-          setProjects(response.data);
+    // Only fetch if projects list is empty and not currently loading
+    if (projects.length === 0 && !projectsLoading) {
+      const fetchProjects = async () => {
+        try {
+          setProjectsLoading(true);
+          const response = await projectService.getProjects(1, 20);
+          console.log('Sidebar - Projects response:', response);
+          if (response.success) {
+            console.log('Sidebar - Projects data:', response.data);
+            setProjects(response.data);
+          }
+        } catch (error) {
+          console.error('Sidebar - Error fetching projects:', error);
+        } finally {
+          setProjectsLoading(false);
         }
-      } catch {
-        // Silent fail - projects dropdown will show empty
-      } finally {
-        setProjectsLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
+      };
+      fetchProjects();
+    }
+  }, []); // Empty dependency array - only run once on mount
 
   return (
     <>
@@ -197,24 +200,26 @@ export const Sidebar = ({ activeSection, onSectionChange, isMobileMenuOpen, setI
                       }`}>Loading...</div>
                     ) : projects.length > 0 ? (
                       projects.map((project) => (
-                        <Link
-                          key={project.id}
-                          href={`/workspace/project/${project.id}`}
-                          className={`block px-3 py-2 text-sm rounded-lg transition-all ${
-                            theme === 'dark'
-                              ? 'text-cyan-200 hover:text-cyan-50 hover:bg-blue-900/30'
-                              : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              project.status === 'active' ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50' :
-                              project.status === 'archived' ? 'bg-slate-400' :
-                              'bg-sky-400 shadow-lg shadow-sky-400/50'
-                            }`} />
-                            <span className="truncate">{project.name}</span>
-                          </div>
-                        </Link>
+                        <React.Fragment key={project.id}>
+                          <Link
+                            href={`/workspace/project/${project.id}`}
+                            className={`block px-3 py-2 text-sm rounded-lg transition-all ${
+                              theme === 'dark'
+                                ? 'text-white hover:text-cyan-300 hover:bg-blue-900/50'
+                                : 'text-slate-700 hover:text-sky-700 hover:bg-sky-50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                                project.status === 'active' ? 'bg-emerald-400 shadow-lg shadow-emerald-400/50' :
+                                project.status === 'completed' ? 'bg-blue-400 shadow-lg shadow-blue-400/50' :
+                                project.status === 'cancelled' ? 'bg-slate-400' :
+                                'bg-amber-400 shadow-lg shadow-amber-400/50'
+                              }`} />
+                              <span className="truncate font-medium">{project.name}</span>
+                            </div>
+                          </Link>
+                        </React.Fragment>
                       ))
                     ) : (
                       <div className={`px-3 py-2 text-xs ${

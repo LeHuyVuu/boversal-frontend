@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
-import { Search, Bell, Menu } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Bell, Menu, LogOut, User } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TopBarProps {
   onMobileMenuToggle: () => void;
@@ -11,6 +12,25 @@ interface TopBarProps {
 
 export const TopBar = React.memo<TopBarProps>(({ onMobileMenuToggle }) => {
   const { theme } = useTheme();
+  const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   return (
     <header className={`border-b px-4 sm:px-6 py-3 sm:py-4 transition-all duration-300 backdrop-blur-md ${
@@ -63,25 +83,63 @@ export const TopBar = React.memo<TopBarProps>(({ onMobileMenuToggle }) => {
             </span>
           </button>
 
-          {/* User Avatar */}
-          <div className={`flex items-center space-x-2 sm:space-x-3 pl-2 sm:pl-4 border-l transition-colors ${
+          {/* User Avatar & Menu */}
+          <div className={`relative flex items-center space-x-2 sm:space-x-3 pl-2 sm:pl-4 border-l transition-colors ${
             theme === 'dark' ? 'border-blue-500/20' : 'border-sky-200'
-          }`}>
-            <img
-              src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop"
-              alt="User"
-              className={`w-9 h-9 rounded-full ring-2 transition-all duration-300 hover:scale-110 cursor-pointer ${
-                theme === 'dark' ? 'ring-blue-500/50 hover:ring-cyan-400' : 'ring-sky-200 hover:ring-sky-400'
-              }`}
-            />
-            <div className="hidden md:block">
-              <p className={`text-sm font-semibold ${
-                theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
-              }`}>Sarah Chen</p>
-              <p className={`text-xs ${
-                theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
-              }`}>Product Manager</p>
-            </div>
+          }`} ref={menuRef}>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center space-x-2 sm:space-x-3 focus:outline-none"
+            >
+              <div className={`w-9 h-9 rounded-full ring-2 flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer ${
+                theme === 'dark' 
+                  ? 'ring-blue-500/50 hover:ring-cyan-400 bg-gradient-to-br from-cyan-500 to-blue-500' 
+                  : 'ring-sky-200 hover:ring-sky-400 bg-gradient-to-br from-sky-400 to-blue-500'
+              }`}>
+                <span className="text-white font-bold text-sm">
+                  {user?.fullName?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div className="hidden md:block text-left">
+                <p className={`text-sm font-semibold ${
+                  theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+                }`}>{user?.fullName || 'User'}</p>
+                <p className={`text-xs ${
+                  theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                }`}>{user?.email || ''}</p>
+              </div>
+            </button>
+
+            {/* User Dropdown Menu */}
+            {showUserMenu && (
+              <div className={`absolute right-0 top-full mt-2 w-48 rounded-xl shadow-2xl overflow-hidden z-50 ${
+                theme === 'dark'
+                  ? 'bg-gray-900 border border-cyan-500/20'
+                  : 'bg-white border border-sky-200'
+              }`}>
+                <div className={`px-4 py-3 border-b ${
+                  theme === 'dark' ? 'border-cyan-500/20' : 'border-sky-200'
+                }`}>
+                  <p className={`text-sm font-semibold ${
+                    theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+                  }`}>{user?.fullName}</p>
+                  <p className={`text-xs ${
+                    theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                  }`}>{user?.email}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className={`w-full px-4 py-2.5 text-left flex items-center gap-2 transition-colors ${
+                    theme === 'dark'
+                      ? 'text-red-400 hover:bg-red-500/10'
+                      : 'text-red-600 hover:bg-red-50'
+                  }`}
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-medium">Đăng xuất</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

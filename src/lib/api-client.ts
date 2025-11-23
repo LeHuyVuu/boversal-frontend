@@ -42,7 +42,7 @@ class ApiClient {
 
         return response.json();
       } else {
-        // For POST/PUT, send URL and data in body
+        // For POST/PUT/PATCH, send URL and data in body
         const response = await fetch('/api/proxy', {
           method,
           credentials: 'include',
@@ -103,12 +103,17 @@ class ApiClient {
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
+
+  async patch<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
-// Export with proxy enabled (hides from Network tab)
-export const apiClient = new ApiClient('', true);
-
-// Export without proxy if needed
-export const apiClientDirect = new ApiClient('', false);
+// Export with direct API calls (no proxy)
+// Change this baseURL to match your backend port
+export const apiClient = new ApiClient('http://localhost:5268/api', false);
 
 export type { ApiResponse };
