@@ -9,9 +9,13 @@ import {
   DragEndEvent,
   DragStartEvent,
   DragOverEvent,
+  closestCenter,
+  closestCorners,
+  pointerWithin,
   rectIntersection,
   useDroppable,
   DragOverlay,
+  CollisionDetection,
 } from '@dnd-kit/core';
 import {
   useSortable,
@@ -28,7 +32,7 @@ const columns = [
   { id: 6, label: 'To Do', color: 'border-slate-500' },
   { id: 7, label: 'In Progress', color: 'border-cyan-500' },
   { id: 9, label: 'Review', color: 'border-amber-500' },
-  { id: 10, label: 'Done', color: 'border-emerald-500' },
+  { id: 4, label: 'Done', color: 'border-emerald-500' },
 ] as const;
 
 interface KanbanBoardProps {
@@ -48,10 +52,28 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
   const sensors = useSensors(
     useSensor(PointerSensor, { 
       activationConstraint: { 
-        distance: 5,
+        distance: 0,
       } 
     })
   );
+
+  // Custom collision detection with multiple strategies for better drop detection
+  const customCollisionDetection: CollisionDetection = (args) => {
+    // First try pointer within
+    const pointerCollisions = pointerWithin(args);
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions;
+    }
+
+    // Then try rect intersection (more forgiving)
+    const rectCollisions = rectIntersection(args);
+    if (rectCollisions.length > 0) {
+      return rectCollisions;
+    }
+
+    // Finally fall back to closest corners
+    return closestCorners(args);
+  };
 
   // Fetch tasks
   useEffect(() => {
@@ -237,7 +259,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
     }`}>
       <DndContext
         sensors={sensors}
-        collisionDetection={rectIntersection}
+        collisionDetection={customCollisionDetection}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
@@ -255,7 +277,110 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                 .sort((a, b) => a.orderIndex - b.orderIndex);
 
               return (
-                <div key={column.id} className="flex flex-col w-full">
+                <ColumnDroppable key={column.id} id={column.id} isOver={overId === column.id}>
+                  <div className="flex flex-col w-full">
+                    <div
+                      className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all ${
+                        theme === 'dark'
+                          ? 'bg-slate-900/60 border-b border-blue-500/20'
+                          : 'bg-white border-b border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h2 className={`font-semibold text-sm ${
+                          theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
+                        }`}>
+                          {column.label}
+                        </h2>
+                        <div className="flex items-center space-x-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            theme === 'dark'
+                              ? 'bg-blue-500/20 text-cyan-300 border border-cyan-500/30'
+                              : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          }`}>
+                            {columnTasks.length}
+                          </span>
+                          <button
+                            onClick={() => {
+                              setCurrentColumn(column.id);
+                            }}
+                            className={`p-1.5 rounded-lg transition-all ${
+                              theme === 'dark'
+                                ? 'text-cyan-400 hover:text-cyan-300 hover:bg-blue-900/30'
+                                : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50'
+                            }`}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <SortableContext
+                      items={columnTasks.map((t) => t.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className={`relative flex-1 rounded-b-xl p-3 space-y-2.5 border border-t-0 ${
+                        columnTasks.length === 0 ? 'min-h-[350px]' : 'min-h-[300px]'
+                      } ${
+                        theme === 'dark'
+                          ? 'bg-slate-900/30 border-blue-500/20'
+                          : 'bg-white border-slate-200'
+                      }`}>
+                        {columnTasks.map((task) => (
+                          <SortableTask
+                            key={task.id}
+                            task={task}
+                            onClick={() => setSelectedTask(task)}
+                          />
+                        ))}
+                        {columnTasks.length === 0 && (
+                          <div className={`absolute inset-3 flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-all duration-200 pointer-events-none ${
+                            overId === column.id
+                              ? theme === 'dark'
+                                ? 'border-cyan-400/80 bg-cyan-500/20 shadow-lg shadow-cyan-500/30 scale-[1.02]'
+                                : 'border-sky-500/80 bg-sky-100 shadow-lg shadow-sky-500/30 scale-[1.02]'
+                              : theme === 'dark' 
+                                ? 'border-blue-500/40 bg-slate-900/50'
+                                : 'border-slate-300 bg-slate-100/50'
+                          }`}>
+                            <div className="text-center">
+                              <p className={`text-sm font-medium mb-1 ${
+                                overId === column.id
+                                  ? theme === 'dark' ? 'text-cyan-300' : 'text-sky-700'
+                                  : theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-400'
+                              }`}>
+                                {overId === column.id ? '📥 Drop here' : 'No tasks'}
+                              </p>
+                              {overId !== column.id && (
+                                <p className={`text-xs ${
+                                  theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
+                                }`}>
+                                  Drag tasks here
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </SortableContext>
+                  </div>
+                </ColumnDroppable>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Desktop: Responsive grid without horizontal scroll */}
+        <div className="hidden lg:grid lg:grid-cols-4 gap-3 xl:gap-4">
+          {columns.map((column) => {
+            const columnTasks = (tasks ?? [])
+              .filter((task) => task.statusId === column.id)
+              .sort((a, b) => a.orderIndex - b.orderIndex);
+
+            return (
+              <ColumnDroppable key={column.id} id={column.id} isOver={overId === column.id}>
+                <div className="flex flex-col">
                   <div
                     className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all ${
                       theme === 'dark'
@@ -293,99 +418,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                     </div>
                   </div>
 
-                  <ColumnDroppable id={column.id} isOver={overId === column.id}>
-                    <SortableContext
-                      items={columnTasks.map((t) => t.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <div className={`flex-1 rounded-b-xl p-3 space-y-2.5 min-h-[300px] border border-t-0 ${
-                        theme === 'dark'
-                          ? 'bg-slate-900/30 border-blue-500/20'
-                          : 'bg-white border-slate-200'
-                      }`}>
-                        {columnTasks.map((task) => (
-                          <SortableTask
-                            key={task.id}
-                            task={task}
-                            onClick={() => setSelectedTask(task)}
-                          />
-                        ))}
-                        {columnTasks.length === 0 && (
-                          <div className={`flex items-center justify-center h-full min-h-[250px] border-2 border-dashed rounded-lg transition-all ${
-                            overId === column.id
-                              ? theme === 'dark'
-                                ? 'border-cyan-400 bg-cyan-500/10'
-                                : 'border-sky-400 bg-sky-100/50'
-                              : theme === 'dark' 
-                                ? 'border-blue-500/20 bg-slate-900/20'
-                                : 'border-slate-200 bg-slate-50'
-                          }`}>
-                            <p className={theme === 'dark' ? 'text-xs text-cyan-400/60' : 'text-xs text-slate-400'}>
-                              {overId === column.id ? 'Drop here' : 'No tasks'}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </SortableContext>
-                  </ColumnDroppable>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Desktop: Responsive grid without horizontal scroll */}
-        <div className="hidden lg:grid lg:grid-cols-4 gap-3 xl:gap-4">
-          {columns.map((column) => {
-            const columnTasks = (tasks ?? [])
-              .filter((task) => task.statusId === column.id)
-              .sort((a, b) => a.orderIndex - b.orderIndex);
-
-            return (
-              <div key={column.id} className="flex flex-col">
-                <div
-                  className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all ${
-                    theme === 'dark'
-                      ? 'bg-slate-900/60 border-b border-blue-500/20'
-                      : 'bg-white border-b border-slate-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <h2 className={`font-semibold text-sm ${
-                      theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
-                    }`}>
-                      {column.label}
-                    </h2>
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        theme === 'dark'
-                          ? 'bg-blue-500/20 text-cyan-300 border border-cyan-500/30'
-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
-                      }`}>
-                        {columnTasks.length}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setCurrentColumn(column.id);
-                        }}
-                        className={`p-1.5 rounded-lg transition-all ${
-                          theme === 'dark'
-                            ? 'text-cyan-400 hover:text-cyan-300 hover:bg-blue-900/30'
-                            : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50'
-                        }`}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <ColumnDroppable id={column.id} isOver={overId === column.id}>
                   <SortableContext
                     items={columnTasks.map((t) => t.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className={`flex-1 rounded-b-xl p-3 space-y-2.5 min-h-[400px] max-h-[calc(100vh-300px)] border border-t-0 overflow-y-auto ${
+                    <div className={`relative flex-1 rounded-b-xl p-3 space-y-2.5 max-h-[calc(100vh-300px)] border border-t-0 overflow-y-auto ${
+                      columnTasks.length === 0 ? 'min-h-[450px]' : 'min-h-[400px]'
+                    } ${
                       theme === 'dark'
                         ? 'bg-slate-900/30 border-blue-500/20 scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-slate-800/50'
                         : 'bg-white border-slate-200 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'
@@ -398,24 +437,37 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                         />
                       ))}
                       {columnTasks.length === 0 && (
-                        <div className={`flex items-center justify-center h-full min-h-[350px] border-2 border-dashed rounded-lg transition-all ${
+                        <div className={`absolute inset-3 flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-all duration-200 pointer-events-none ${
                           overId === column.id
                             ? theme === 'dark'
-                              ? 'border-cyan-400 bg-cyan-500/10'
-                              : 'border-sky-400 bg-sky-100/50'
+                              ? 'border-cyan-400/80 bg-cyan-500/20 shadow-lg shadow-cyan-500/30 scale-[1.02]'
+                              : 'border-sky-500/80 bg-sky-100 shadow-lg shadow-sky-500/30 scale-[1.02]'
                             : theme === 'dark' 
-                              ? 'border-blue-500/20 bg-slate-900/20'
-                              : 'border-slate-200 bg-slate-50'
+                              ? 'border-blue-500/40 bg-slate-900/50'
+                              : 'border-slate-300 bg-slate-100/50'
                         }`}>
-                          <p className={theme === 'dark' ? 'text-sm text-cyan-400/60' : 'text-sm text-slate-400'}>
-                            {overId === column.id ? 'Drop here' : 'No tasks'}
-                          </p>
+                          <div className="text-center">
+                            <p className={`text-base font-medium mb-1 ${
+                              overId === column.id
+                                ? theme === 'dark' ? 'text-cyan-300' : 'text-sky-700'
+                                : theme === 'dark' ? 'text-cyan-400/70' : 'text-slate-400'
+                            }`}>
+                              {overId === column.id ? '📥 Drop here' : 'No tasks'}
+                            </p>
+                            {overId !== column.id && (
+                              <p className={`text-xs ${
+                                theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
+                              }`}>
+                                Drag tasks here
+                              </p>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
                   </SortableContext>
-                </ColumnDroppable>
-              </div>
+                </div>
+              </ColumnDroppable>
             );
           })}
         </div>
@@ -443,20 +495,31 @@ const ColumnDroppable: React.FC<React.PropsWithChildren<{ id: number; isOver?: b
   children,
   isOver: isOverProp,
 }) => {
-  const { setNodeRef, isOver: isOverDroppable } = useDroppable({ id });
+  const { setNodeRef, isOver: isOverDroppable } = useDroppable({ 
+    id,
+    data: {
+      type: 'column',
+      columnId: id,
+      accepts: ['task'],
+    },
+  });
   const { theme } = useTheme();
   const isOver = isOverProp || isOverDroppable;
   
   return (
     <div
       ref={setNodeRef}
-      className={`transition-all ${
+      data-column-id={id}
+      className={`transition-all duration-200 rounded-xl ${
         isOver 
           ? theme === 'dark'
-            ? 'ring-2 ring-cyan-400/70 rounded-b-xl bg-cyan-500/5' 
-            : 'ring-2 ring-sky-400/70 rounded-b-xl bg-sky-50/80'
+            ? 'ring-4 ring-cyan-400 bg-cyan-500/10 scale-[1.01]' 
+            : 'ring-4 ring-sky-500 bg-sky-100 scale-[1.01]'
           : ''
       }`}
+      style={{ 
+        minHeight: '500px',
+      }}
     >
       {children}
     </div>
@@ -468,19 +531,28 @@ const SortableTask: React.FC<{ task: Task; onClick: () => void }> = ({
   onClick,
 }) => {
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } =
-    useSortable({ id: task.id });
+    useSortable({ 
+      id: task.id,
+      data: {
+        type: 'task',
+        task,
+        statusId: task.statusId,
+      },
+    });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    transition: transition || 'transform 200ms cubic-bezier(0.2, 0, 0, 1)',
-    opacity: isDragging ? 0.4 : 1,
+    transition: transition || 'transform 200ms ease',
+    opacity: isDragging ? 0.3 : 1,
     cursor: isDragging ? 'grabbing' : 'grab',
     borderRadius: '0.75rem',
-    zIndex: isDragging ? 50 : 'auto',
+    zIndex: isDragging ? 999 : 'auto',
     userSelect: 'none',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     msUserSelect: 'none',
+    touchAction: 'none',
+    pointerEvents: isDragging ? 'none' : 'auto',
   };
 
   return (
@@ -489,7 +561,7 @@ const SortableTask: React.FC<{ task: Task; onClick: () => void }> = ({
       style={style}
       {...attributes}
       {...listeners}
-      className={isDragging ? 'shadow-2xl ring-2 ring-cyan-400' : ''}
+      className={isDragging ? 'shadow-2xl ring-2 ring-cyan-400 scale-105' : ''}
     >
       <div onClick={onClick} style={{ pointerEvents: isDragging ? 'none' : 'auto' }}>
         <TaskCard task={task} onClick={onClick} />

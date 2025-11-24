@@ -21,23 +21,23 @@ const formatDate = (dateString: string | null | undefined): string => {
 const getStatusClassName = (statusId: number, theme: string): string => {
   const styles = {
     dark: {
-      1: 'bg-slate-500/20 text-slate-300 border border-slate-500/30', // To Do
-      2: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30', // In Progress
-      3: 'bg-amber-500/20 text-amber-300 border border-amber-500/30', // Review
+      6: 'bg-slate-500/20 text-slate-300 border border-slate-500/30', // To Do
+      7: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30', // In Progress
+      9: 'bg-amber-500/20 text-amber-300 border border-amber-500/30', // Review
       4: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30', // Done
       5: 'bg-red-500/20 text-red-300 border border-red-500/30', // Cancelled
     },
     light: {
-      1: 'bg-slate-100 text-slate-600',
-      2: 'bg-sky-100 text-sky-700',
-      3: 'bg-yellow-100 text-yellow-700',
+      6: 'bg-slate-100 text-slate-600',
+      7: 'bg-sky-100 text-sky-700',
+      9: 'bg-yellow-100 text-yellow-700',
       4: 'bg-emerald-100 text-emerald-700',
       5: 'bg-red-100 text-red-700',
     }
   };
   return theme === 'dark' 
-    ? (styles.dark[statusId as keyof typeof styles.dark] || styles.dark[1])
-    : (styles.light[statusId as keyof typeof styles.light] || styles.light[1]);
+    ? (styles.dark[statusId as keyof typeof styles.dark] || styles.dark[6])
+    : (styles.light[statusId as keyof typeof styles.light] || styles.light[6]);
 };
 
 const getPriorityClassName = (priority: string, theme: string): string => {
@@ -62,9 +62,9 @@ const getPriorityClassName = (priority: string, theme: string): string => {
 
 const getStatusLabel = (statusId: number): string => {
   const labels: Record<number, string> = {
-    1: 'To Do',
-    2: 'In Progress',
-    3: 'Review',
+    6: 'To Do',
+    7: 'In Progress',
+    9: 'Review',
     4: 'Done',
     5: 'Cancelled',
   };
