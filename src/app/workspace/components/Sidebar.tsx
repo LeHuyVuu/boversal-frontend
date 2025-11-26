@@ -11,11 +11,13 @@ import {
   SidebarClose,
   Video,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Timer
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { projectService, Project } from '@/services/projectService';
+import { projectService } from '@/services/projectService';
+import { ProjectDto } from '@/types/project';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const menuItems = [
@@ -24,6 +26,7 @@ const menuItems = [
   { icon: AlertCircle, label: 'Issues', key: 'issues' as const },
   { icon: Calendar, label: 'Calendar', key: 'calendar' as const },
   { icon: Video, label: 'Meetings', key: 'meetings' as const },
+  { icon: Timer, label: 'Pomodoro', key: 'pomodoro' as const },
   { icon: HardDrive, label: 'Storage', key: 'storage' as const },
   { icon: FileText, label: 'Documents', key: 'documents' as const },
 ];
@@ -35,6 +38,7 @@ interface SidebarProps {
     | 'issues'
     | 'calendar'
     | 'meetings'
+    | 'pomodoro'
     | 'storage'
     | 'documents';
   onSectionChange: (
@@ -44,6 +48,7 @@ interface SidebarProps {
       | 'issues'
       | 'calendar'
       | 'meetings'
+      | 'pomodoro'
       | 'storage'
       | 'documents'
   ) => void;
@@ -55,7 +60,7 @@ export const Sidebar = ({ activeSection, onSectionChange, isMobileMenuOpen, setI
   const { theme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [projectsExpanded, setProjectsExpanded] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectDto[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
 
   useEffect(() => {
@@ -65,13 +70,10 @@ export const Sidebar = ({ activeSection, onSectionChange, isMobileMenuOpen, setI
         try {
           setProjectsLoading(true);
           const response = await projectService.getProjects(1, 20);
-          console.log('Sidebar - Projects response:', response);
-          if (response.success) {
-            console.log('Sidebar - Projects data:', response.data);
-            setProjects(response.data);
-          }
+          setProjects(response.data || []);
         } catch (error) {
-          console.error('Sidebar - Error fetching projects:', error);
+          // Silently fail - will show empty projects list
+          setProjects([]);
         } finally {
           setProjectsLoading(false);
         }

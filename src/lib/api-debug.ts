@@ -16,7 +16,14 @@ export function checkApiHiding() {
         timestamp: new Date().toISOString()
       });
     }
-    return originalFetch.apply(this, args);
+    
+    // Safely call original fetch with proper context
+    try {
+      return originalFetch.call(window, ...args);
+    } catch (error) {
+      console.error('[API Debug] Fetch error:', error);
+      throw error;
+    }
   };
 
   console.log('✅ API hiding system active');

@@ -5,10 +5,12 @@ import { apiClient } from '@/lib/api-client';
 
 // User type from API
 export interface User {
-  userId: number;
+  id: number;
+  userId?: number; // Keep for backward compatibility
   email: string;
   fullName: string;
-  avatarUrl?: string;
+  phoneNumber?: string | null;
+  avatarUrl?: string | null;
   role?: string;
 }
 
@@ -30,20 +32,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check authentication status on mount
   useEffect(() => {
-    checkAuth();
+    // Only check auth if we're not on login/register pages
+    if (typeof window !== 'undefined') {
+      const isAuthPage = window.location.pathname === '/login' || 
+                        window.location.pathname === '/register';
+      if (!isAuthPage) {
+        checkAuth();
+      } else {
+        setLoading(false);
+      }
+    }
   }, []);
 
   const checkAuth = async () => {
     try {
       const response = await apiClient.get<User>('/Auth/me');
       
-      if (response.success) {
+      if (response.success && response.data) {
         setUser(response.data);
       } else {
         setUser(null);
       }
     } catch (error) {
-      console.error('[Auth] Check failed:', error);
+      // Silently fail - user is not authenticated
       setUser(null);
     } finally {
       setLoading(false);
@@ -99,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await apiClient.post<null>('/Auth/logout', {});
     } catch (error) {
-      console.error('[Auth] Logout failed:', error);
+      // Silently fail - will redirect anyway
     } finally {
       setUser(null);
       

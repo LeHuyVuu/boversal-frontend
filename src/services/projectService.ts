@@ -1,91 +1,64 @@
 import { apiClient } from '@/lib/api-client';
+import type { 
+  CreateProjectDto, 
+  UpdateProjectDto, 
+  ProjectDto, 
+  PaginatedResponse 
+} from '@/types/project';
 
 // API Response wrapper
 interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
-  pageNumber?: number;
-  pageSize?: number;
-  totalPages?: number;
-  totalRecords?: number;
-}
-
-// Project types
-export interface Project {
-  id: number;
-  projectId?: number;
-  name: string;
-  projectName?: string;
-  ownerId: number;
-  description: string;
-  shortIntro?: string;
-  highlight?: string;
-  demoUrl?: string;
-  startDate: string;
-  endDate?: string;
-  status: string;
-  statusId?: number;
-  statusName?: string;
-  createdBy?: number;
-  createdAt: string;
-  updatedAt?: string;
-  memberCount?: number;
-  taskCount?: number;
-  progress?: number;
-  managerId?: {
-    fullName: string;
-    email?: string;
-    phone?: string;
-  };
-}
-
-export interface CreateProjectRequest {
-  projectName: string;
-  description: string;
-  startDate: string;
-  endDate?: string;
-  statusId?: number;
-}
-
-export interface UpdateProjectRequest {
-  projectName?: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-  statusId?: number;
+  errors?: Record<string, string[]>;
 }
 
 // Project service
 export const projectService = {
-  // Get all projects with pagination
+  // Create new project (POST /api/Project)
+  async createProject(data: CreateProjectDto): Promise<ApiResponse<number>> {
+    return await apiClient.post<number>('/Project', data);
+  },
+
+  // Get all projects with pagination (GET /api/Project?pageNumber=1&pageSize=10)
   async getProjects(
     pageNumber: number = 1,
-    pageSize: number = 10,
-    search?: string
-  ): Promise<ApiResponse<Project[]>> {
-    let url = `/Project?pageNumber=${pageNumber}&pageSize=${pageSize}`;
-    if (search) url += `&search=${encodeURIComponent(search)}`;
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<ProjectDto>> {
+    const url = `/Project?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    const response = await apiClient.get<any>(url);
     
-    return await apiClient.get<Project[]>(url);
+    // API trả về: { success, message, data: [...], pageNumber, pageSize, totalPages, totalRecords }
+    if (response.success && response.data) {
+      return {
+        data: response.data,
+        pageNumber: response.pageNumber || pageNumber,
+        pageSize: response.pageSize || pageSize,
+        totalPages: response.totalPages || 1,
+        totalCount: response.totalRecords || 0,
+        hasPreviousPage: (response.pageNumber || pageNumber) > 1,
+        hasNextPage: (response.pageNumber || pageNumber) < (response.totalPages || 1)
+      };
+    }
+    
+    throw new Error(response.message || 'Failed to fetch projects');
   },
 
-  // Get single project by ID
-  async getProject(projectId: number): Promise<ApiResponse<Project>> {
-    return await apiClient.get<Project>(`/Project/${projectId}`);
+  // Get single project by ID (GET /api/Project/{id})
+  async getProject(projectId: number): Promise<ApiResponse<ProjectDto>> {
+    return await apiClient.get<ProjectDto>(`/Project/${projectId}`);
   },
 
-  // Create new project
-  async createProject(data: CreateProjectRequest): Promise<ApiResponse<Project>> {
-    return await apiClient.post<Project>('/Project', data);
+  // Update project (PUT /api/Project/{id})
+  async updateProject(projectId: number, data: UpdateProjectDto): Promise<ApiResponse<null>> {
+    if (projectId !== data.id) {
+      throw new Error('Project ID mismatch');
+    }
+    return await apiClient.put<null>(`/Project/${projectId}`, data);
   },
 
-  // Update project
-  async updateProject(projectId: number, data: UpdateProjectRequest): Promise<ApiResponse<Project>> {
-    return await apiClient.put<Project>(`/Project/${projectId}`, data);
-  },
-
-  // Delete project
+  // Delete project (DELETE /api/Project/{id})
   async deleteProject(projectId: number): Promise<ApiResponse<null>> {
     return await apiClient.delete<null>(`/Project/${projectId}`);
   }

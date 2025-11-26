@@ -11,11 +11,14 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRouter } from 'next/navigation';
 import { AnimatedCard } from '@/components/AnimatedCard';
 import { AnimatedButton } from '@/components/AnimatedButton';
 import { CardSkeleton } from '@/components/LoadingSkeleton';
 import { useDebounce } from '@/hooks/useDebounce';
-import { projectService, Project as ApiProject } from '@/services/projectService';
+import { projectService } from '@/services/projectService';
+import { ProjectDto } from '@/types/project';
+import CreateProjectModal from './CreateProjectModal';
 
 const formatDate = (dateString?: string | null) => {
   if (!dateString) return '—';
@@ -43,7 +46,7 @@ const getStatusColor = (statusId: number, isDark: boolean) => {
   }
 };
 
-const ProjectCard = React.memo<{ project: ApiProject; index: number }>(({ project, index }) => {
+const ProjectCard = React.memo<{ project: ProjectDto; index: number }>(({ project, index }) => {
   const { theme } = useTheme();
   
   return (
@@ -60,16 +63,16 @@ const ProjectCard = React.memo<{ project: ApiProject; index: number }>(({ projec
           <div className="flex items-center gap-3 mb-2">
             <h3 className={`text-lg font-semibold ${
               theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-            }`}>{project.projectName}</h3>
+            }`}>{project.name}</h3>
             <span className={`px-3 py-1 rounded-full text-xs font-medium border ${
-              getStatusColor(project.statusId, theme === 'dark')
+              theme === 'dark' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border-emerald-200'
             }`}>
-              {project.statusName || 'Active'}
+              {project.status || 'Active'}
             </span>
           </div>
         </div>
         <Link
-          href={`/workspace/project/${project.projectId}`}
+          href={`/workspace/project/${project.id}`}
           className={`p-2 rounded-lg transition-all ${
             theme === 'dark'
               ? 'hover:bg-blue-900/30 text-cyan-400'
@@ -83,7 +86,7 @@ const ProjectCard = React.memo<{ project: ApiProject; index: number }>(({ projec
       <p className={`text-sm mb-4 line-clamp-2 ${
         theme === 'dark' ? 'text-cyan-400/70' : 'text-slate-500'
       }`}>
-        {project.description}
+        {project.description || project.shortIntro || 'No description'}
       </p>
 
       <div className={`flex items-center justify-between pt-4 border-t ${
@@ -96,17 +99,6 @@ const ProjectCard = React.memo<{ project: ApiProject; index: number }>(({ projec
             <Calendar className="w-4 h-4" />
             <span>{formatDate(project.startDate)}</span>
           </div>
-          <div className={`flex items-center gap-1 ${
-            theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
-          }`}>
-            <Users className="w-4 h-4" />
-            <span>{project.memberCount || 0}</span>
-          </div>
-        </div>
-        <div className={`text-sm font-medium ${
-          theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
-        }`}>
-          {project.taskCount || 0} tasks
         </div>
       </div>
     </AnimatedCard>
@@ -115,9 +107,10 @@ const ProjectCard = React.memo<{ project: ApiProject; index: number }>(({ projec
 
 ProjectCard.displayName = 'ProjectCard';
 
-export const Projects = React.memo(() => {
+export function Projects() {
   const { theme } = useTheme();
-  const [projects, setProjects] = useState<ApiProject[]>([]);
+  const router = useRouter();
+  const [projects, setProjects] = useState<ProjectDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -127,6 +120,7 @@ export const Projects = React.memo(() => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [statusFilter, setStatusFilter] = useState<number | 'all'>('all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -136,8 +130,8 @@ export const Projects = React.memo(() => {
         setError(null);
         const response = await projectService.getProjects(pageNumber, pageSize, debouncedSearch);
         
-        if (mounted && response.success) {
-          setProjects(response.data);
+        if (mounted) {
+          setProjects(response.data || []);
           setTotalPages(response.totalPages || 1);
         }
       } catch (e: any) {
@@ -156,10 +150,31 @@ export const Projects = React.memo(() => {
 
   const filteredProjects = useMemo(() => {
     return projects.filter((p) => {
-      const matchesStatus = statusFilter === 'all' || p.statusId === statusFilter;
+      // API trả về status dạng string như "active", không có statusId
+      const matchesStatus = statusFilter === 'all' || 
+        (statusFilter === 1 && p.status === 'active') ||
+        (statusFilter === 2 && p.status === 'completed') ||
+        (statusFilter === 3 && p.status === 'on_hold') ||
+        (statusFilter === 4 && p.status === 'cancelled');
       return matchesStatus;
     });
   }, [projects, statusFilter]);
+
+  const handleCreateSuccess = async (projectId: number) => {
+    setShowCreateModal(false);
+    // Refresh project list immediately
+    try {
+      setLoading(true);
+      const response = await projectService.getProjects(1, pageSize, debouncedSearch);
+      setProjects(response.data || []);
+      setTotalPages(response.totalPages || 1);
+      setPageNumber(1); // Reset to first page to see new project
+    } catch (e) {
+      console.error('Failed to refresh projects');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex-1 p-6 overflow-y-auto scrollbar-thin gpu-accelerated">
@@ -174,13 +189,17 @@ export const Projects = React.memo(() => {
               theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
             }`}>Manage and track all your projects in one place.</p>
           </div>
-          <AnimatedButton
-            variant="primary"
-            className="whitespace-nowrap"
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg ${
+              theme === 'dark'
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white hover:shadow-cyan-500/50'
+                : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-blue-500/50'
+            }`}
           >
             <Plus className="w-5 h-5" />
             <span>New Project</span>
-          </AnimatedButton>
+          </button>
         </div>
 
         {/* Filters */}
@@ -255,7 +274,7 @@ export const Projects = React.memo(() => {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProjects.map((project, index) => (
-                    <ProjectCard key={project.projectId} project={project} index={index} />
+                    <ProjectCard key={project.id} project={project} index={index} />
                   ))}
                 </div>
 
@@ -310,8 +329,14 @@ export const Projects = React.memo(() => {
           </>
         )}
       </div>
+
+      {/* Create Project Modal */}
+      {showCreateModal && (
+        <CreateProjectModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={handleCreateSuccess}
+        />
+      )}
     </div>
   );
-});
-
-Projects.displayName = 'Projects';;
+}

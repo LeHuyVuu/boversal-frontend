@@ -6,7 +6,7 @@ import { TopBar } from './components/TopBar';
 import { GalaxyBackground } from '@/components/GalaxyBackground';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
-type Section = 'dashboard' | 'projects' | 'issues' | 'calendar' | 'meetings' | 'storage' | 'documents';
+type Section = 'dashboard' | 'projects' | 'issues' | 'calendar' | 'meetings' | 'pomodoro' | 'storage' | 'documents';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');

@@ -2,10 +2,12 @@
 import React from 'react';
 import { Task } from '@/services/taskService';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Edit2 } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
   onClick: (task: Task) => void;
+  onEdit?: (task: Task, e: React.MouseEvent) => void;
 }
 
 const formatDate = (dateString: string | null | undefined): string => {
@@ -75,18 +77,38 @@ const getPriorityLabel = (priority: string): string => {
   return priority.charAt(0).toUpperCase() + priority.slice(1);
 };
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onEdit }) => {
   const { theme } = useTheme();
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    onEdit?.(task, e);
+  };
   
   return (
     <div
       onClick={() => onClick(task)}
-      className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 group ${
+      className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 group relative ${
         theme === 'dark'
           ? 'bg-slate-800/60 border-blue-500/20 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-500/10'
           : 'bg-white border-slate-200 hover:border-sky-300 hover:shadow-md'
       }`}
     >
+      {/* Edit Button */}
+      {onEdit && (
+        <button
+          onClick={handleEditClick}
+          className={`absolute top-2 right-2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${
+            theme === 'dark'
+              ? 'bg-slate-700 hover:bg-slate-600 text-cyan-400'
+              : 'bg-slate-100 hover:bg-slate-200 text-blue-600'
+          }`}
+          title="Edit task"
+        >
+          <Edit2 className="w-3.5 h-3.5" />
+        </button>
+      )}
+
       <div className="flex items-start justify-between mb-3">
         <span className={`text-xs font-medium px-2 py-1 rounded ${getPriorityClassName(task.priority, theme)}`}>
           {getPriorityLabel(task.priority)}

@@ -46,13 +46,27 @@ export interface Task {
 }
 
 export interface CreateTaskRequest {
-  taskName: string;
-  description?: string;
   projectId: number;
-  assigneeId?: number;
   statusId?: number;
-  priorityId?: number;
+  title: string;
+  description?: string;
+  priority: string;
   dueDate?: string;
+  orderIndex: number;
+  assigneeIds: number[];
+}
+
+// Full update DTO for PUT /api/Task/{id}
+export interface UpdateTaskDto {
+  id: number;
+  projectId: number;
+  statusId: number | null;
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  dueDate: string | null;
+  orderIndex: number;
+  assigneeIds: number[];
 }
 
 export interface UpdateTaskRequest {
@@ -113,9 +127,18 @@ export const taskService = {
     return await apiClient.post<Task>('/Task', data);
   },
 
-  // Update task
+  // Update task (partial update - legacy)
   async updateTask(taskId: number, data: UpdateTaskRequest): Promise<ApiResponse<Task>> {
     return await apiClient.put<Task>(`/Task/${taskId}`, data);
+  },
+
+  // Update task (full update - PUT /api/Task/{id})
+  async updateTaskFull(taskId: number, data: UpdateTaskDto): Promise<ApiResponse<null>> {
+    // Validation: ID must match
+    if (taskId !== data.id) {
+      throw new Error('Task ID in URL must match ID in body');
+    }
+    return await apiClient.put<null>(`/Task/${taskId}`, data);
   },
 
   // Patch task (for Kanban drag & drop)

@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, Menu, LogOut, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Search, Bell, Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import UserProfileModal from './UserProfileModal';
 
 interface TopBarProps {
   onMobileMenuToggle: () => void;
@@ -12,27 +14,16 @@ interface TopBarProps {
 
 export const TopBar = React.memo<TopBarProps>(({ onMobileMenuToggle }) => {
   const { theme } = useTheme();
-  const { user, logout } = useAuth();
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Close menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    setMounted(true);
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
-  };
-
   return (
+    <>
     <header className={`border-b px-4 sm:px-6 py-3 sm:py-4 transition-all duration-300 backdrop-blur-md ${
       theme === 'dark'
         ? 'bg-black/50 border-blue-500/20'
@@ -86,9 +77,9 @@ export const TopBar = React.memo<TopBarProps>(({ onMobileMenuToggle }) => {
           {/* User Avatar & Menu */}
           <div className={`relative flex items-center space-x-2 sm:space-x-3 pl-2 sm:pl-4 border-l transition-colors ${
             theme === 'dark' ? 'border-blue-500/20' : 'border-sky-200'
-          }`} ref={menuRef}>
+          }`}>
             <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
+              onClick={() => setShowProfileModal(true)}
               className="flex items-center space-x-2 sm:space-x-3 focus:outline-none"
             >
               <div className={`w-9 h-9 rounded-full ring-2 flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer ${
@@ -109,41 +100,17 @@ export const TopBar = React.memo<TopBarProps>(({ onMobileMenuToggle }) => {
                 }`}>{user?.email || ''}</p>
               </div>
             </button>
-
-            {/* User Dropdown Menu */}
-            {showUserMenu && (
-              <div className={`absolute right-0 top-full mt-2 w-48 rounded-xl shadow-2xl overflow-hidden z-50 ${
-                theme === 'dark'
-                  ? 'bg-gray-900 border border-cyan-500/20'
-                  : 'bg-white border border-sky-200'
-              }`}>
-                <div className={`px-4 py-3 border-b ${
-                  theme === 'dark' ? 'border-cyan-500/20' : 'border-sky-200'
-                }`}>
-                  <p className={`text-sm font-semibold ${
-                    theme === 'dark' ? 'text-cyan-100' : 'text-slate-700'
-                  }`}>{user?.fullName}</p>
-                  <p className={`text-xs ${
-                    theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
-                  }`}>{user?.email}</p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className={`w-full px-4 py-2.5 text-left flex items-center gap-2 transition-colors ${
-                    theme === 'dark'
-                      ? 'text-red-400 hover:bg-red-500/10'
-                      : 'text-red-600 hover:bg-red-50'
-                  }`}
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="text-sm font-medium">Đăng xuất</span>
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
     </header>
+
+      {/* User Profile Modal - Render outside DOM via Portal */}
+      {mounted && showProfileModal && createPortal(
+        <UserProfileModal onClose={() => setShowProfileModal(false)} />,
+        document.body
+      )}
+    </>
   );
 });
 
