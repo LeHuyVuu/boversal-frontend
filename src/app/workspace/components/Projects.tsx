@@ -212,6 +212,8 @@ export function Projects() {
       setProjects(response.data || []);
       setTotalPages(response.totalPages || 1);
       setPageNumber(1); // Reset to first page to see new project
+      // Notify sidebar to refresh
+      window.dispatchEvent(new Event('projectsChanged'));
     } catch (e) {
       (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: 'Failed to refresh project list', life: 3000 });
       console.error('Failed to refresh projects');
@@ -238,6 +240,8 @@ export function Projects() {
       const response = await projectService.getProjects(pageNumber, pageSize, debouncedSearch);
       setProjects(response.data || []);
       setTotalPages(response.totalPages || 1);
+      // Notify sidebar to refresh
+      window.dispatchEvent(new Event('projectsChanged'));
     } catch (e) {
       console.error('Failed to refresh projects');
     }
@@ -251,6 +255,8 @@ export function Projects() {
       const response = await projectService.getProjects(pageNumber, pageSize, debouncedSearch);
       setProjects(response.data || []);
       setTotalPages(response.totalPages || 1);
+      // Notify sidebar to refresh
+      window.dispatchEvent(new Event('projectsChanged'));
     } catch (e) {
       console.error('Failed to refresh projects');
     }

@@ -63,24 +63,34 @@ export const Sidebar = ({ activeSection, onSectionChange, isMobileMenuOpen, setI
   const [projects, setProjects] = useState<ProjectDto[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
 
-  useEffect(() => {
-    // Only fetch if projects list is empty and not currently loading
-    if (projects.length === 0 && !projectsLoading) {
-      const fetchProjects = async () => {
-        try {
-          setProjectsLoading(true);
-          const response = await projectService.getProjects(1, 20);
-          setProjects(response.data || []);
-        } catch (error) {
-          // Silently fail - will show empty projects list
-          setProjects([]);
-        } finally {
-          setProjectsLoading(false);
-        }
-      };
-      fetchProjects();
+  const fetchProjects = async () => {
+    try {
+      setProjectsLoading(true);
+      const response = await projectService.getProjects(1, 20);
+      setProjects(response.data || []);
+    } catch (error) {
+      // Silently fail - will show empty projects list
+      setProjects([]);
+    } finally {
+      setProjectsLoading(false);
     }
-  }, []); // Empty dependency array - only run once on mount
+  };
+
+  useEffect(() => {
+    // Initial fetch
+    fetchProjects();
+
+    // Listen for project changes
+    const handleProjectsChange = () => {
+      fetchProjects();
+    };
+
+    window.addEventListener('projectsChanged', handleProjectsChange);
+
+    return () => {
+      window.removeEventListener('projectsChanged', handleProjectsChange);
+    };
+  }, []);
 
   return (
     <>
