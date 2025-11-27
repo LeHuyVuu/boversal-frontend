@@ -215,6 +215,7 @@ export const Sidebar = ({ activeSection, onSectionChange, isMobileMenuOpen, setI
                         <React.Fragment key={project.id}>
                           <Link
                             href={`/workspace/project/${project.id}`}
+                            onClick={() => onSectionChange('projects')}
                             className={`block px-3 py-2 text-sm rounded-lg transition-all ${
                               theme === 'dark'
                                 ? 'text-white hover:text-cyan-300 hover:bg-blue-900/50'

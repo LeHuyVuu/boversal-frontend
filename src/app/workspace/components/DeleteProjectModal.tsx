@@ -87,8 +87,12 @@ export const DeleteProjectModal: React.FC<DeleteProjectModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-sm overflow-y-auto"
+      onClick={onClose}
+    >
       <div
+        onClick={(e) => e.stopPropagation()}
         className={`relative w-full max-w-md my-4 sm:my-8 rounded-2xl shadow-2xl ${
           theme === 'dark'
             ? 'bg-slate-900 border border-red-500/20'

@@ -250,13 +250,15 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   placeholder="Enter task title..."
                   autoFocus
                   maxLength={500}
-                  className={`w-full px-4 py-3 rounded-lg border transition-all ${
+                  className={`w-full px-4 py-3 rounded-lg border transition-all outline-none ${
                     errors.title
-                      ? 'border-red-500 focus:ring-2 focus:ring-red-500/50'
+                      ? theme === 'dark'
+                        ? 'bg-slate-800 border-red-500 text-white placeholder-slate-500 focus:ring-2 focus:ring-red-500/50'
+                        : 'bg-white border-red-500 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-red-500/50'
                       : theme === 'dark'
                       ? 'bg-slate-800 border-cyan-500/20 text-white placeholder-slate-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50'
                       : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50'
-                  } outline-none`}
+                  }`}
                 />
                 {errors.title && (
                   <p className="text-red-500 text-sm mt-2 flex items-center gap-1">

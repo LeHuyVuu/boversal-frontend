@@ -12,7 +12,7 @@ export default function ProjectDetailPage() {
 
   return (
     <div className={theme === 'dark' ? 'bg-black/50' : 'bg-white'}>
-      <ProjectDetail projectId={projectId} />
+      {/* <ProjectDetail projectId={projectId} /> */}
       <KanbanBoard projectId={projectId} />
     </div>
   );
