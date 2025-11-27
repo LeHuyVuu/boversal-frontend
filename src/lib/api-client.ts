@@ -162,9 +162,11 @@ class ApiClient {
 }
 
 // Export with direct API calls (no proxy)
-// Change this baseURL to match your backend port
-// Use environment variable if available
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5268';
-export const apiClient = new ApiClient(`${API_URL}/api`, false);
+// API Gateway Configuration - All requests route through Gateway
+const GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8080';
+const PROJECT_SERVICE = process.env.NEXT_PUBLIC_PROJECT_SERVICE || '/project-management-service';
+const API_URL = `${GATEWAY_URL}${PROJECT_SERVICE}`;
+
+export const apiClient = new ApiClient(API_URL, false);
 
 export type { ApiResponse };

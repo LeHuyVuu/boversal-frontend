@@ -159,7 +159,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
     }
   };
 
-  // *** ĐÃ SỬA: kéo thả đúng vị trí người dùng thả ***
+  // *** ĐÃ SỬA: kéo thả đúng vị trí người dùng thả + cho phép sắp xếp trong cùng cột ***
   const handleDragEnd = async (e: DragEndEvent) => {
     const { active, over, delta } = e;
     setActiveTask(null);
@@ -181,28 +181,57 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
     }
 
     const targetStatusId = isColumn ? targetId : overTask!.statusId;
+    const isSameColumn = activeTaskData.statusId === targetStatusId;
 
-    // Lấy tất cả task trong cột target (trừ task đang drag)
-    const columnTasks = tasks
-      .filter((t) => t.statusId === targetStatusId && t.id !== taskId)
+    // Lấy tất cả task trong cột target (bao gồm cả task đang drag nếu cùng cột)
+    let columnTasks = tasks
+      .filter((t) => t.statusId === targetStatusId)
       .sort((a, b) => a.orderIndex - b.orderIndex);
 
     let targetIndex: number;
 
     if (isColumn) {
       // Thả vào vùng cột → cho xuống cuối cột
+      if (isSameColumn) {
+        // Nếu cùng cột, loại bỏ task đang kéo để tính index đúng
+        columnTasks = columnTasks.filter((t) => t.id !== taskId);
+      }
       targetIndex = columnTasks.length;
     } else {
-      // Thả lên 1 task khác → xác định index
-      targetIndex = columnTasks.findIndex((t) => t.id === targetId);
-
-      if (targetIndex === -1) {
-        // fallback: nếu không tìm thấy thì add vào cuối
-        targetIndex = columnTasks.length;
+      // Thả lên 1 task khác
+      if (isSameColumn) {
+        // Cùng cột: tìm vị trí của overTask trong danh sách đầy đủ
+        const currentIndex = columnTasks.findIndex((t) => t.id === taskId);
+        const overIndex = columnTasks.findIndex((t) => t.id === targetId);
+        
+        if (currentIndex === -1 || overIndex === -1) return;
+        
+        // Loại bỏ task đang kéo
+        columnTasks = columnTasks.filter((t) => t.id !== taskId);
+        
+        // Xác định vị trí mới
+        const newOverIndex = columnTasks.findIndex((t) => t.id === targetId);
+        
+        // Nếu kéo xuống (delta.y > 0) thì insert sau overTask, ngược lại insert trước
+        if (currentIndex < overIndex) {
+          // Kéo xuống dưới
+          targetIndex = newOverIndex + 1;
+        } else {
+          // Kéo lên trên
+          targetIndex = newOverIndex;
+        }
       } else {
-        // Nếu người dùng kéo xuống dưới item → cho vào sau nó
-        if (delta.y > 0) {
-          targetIndex = targetIndex + 1;
+        // Khác cột: loại bỏ task đang kéo
+        columnTasks = columnTasks.filter((t) => t.id !== taskId);
+        targetIndex = columnTasks.findIndex((t) => t.id === targetId);
+        
+        if (targetIndex === -1) {
+          targetIndex = columnTasks.length;
+        } else {
+          // Nếu người dùng kéo xuống dưới item → cho vào sau nó
+          if (delta.y > 0) {
+            targetIndex = targetIndex + 1;
+          }
         }
       }
     }
@@ -315,8 +344,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
         }}
       >
         {/* Mobile: Single column scroll */}
-        <div className="block lg:hidden">
-          <div className="flex flex-col gap-4">
+        <div className="block lg:hidden h-[calc(100vh-120px)]">
+          <div className="flex flex-col gap-4 h-full">
             {columns.map((column) => {
               const columnTasks = (tasks ?? [])
                 .filter((task) => task.statusId === column.id)
@@ -328,9 +357,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                   id={column.id}
                   isOver={overId === column.id}
                 >
-                  <div className="flex flex-col w-full">
+                  <div className="flex flex-col w-full h-full">
                     <div
-                      className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all ${
+                      className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all flex-shrink-0 ${
                         theme === 'dark'
                           ? 'bg-slate-900/60 border-b border-blue-500/20'
                           : 'bg-white border-b border-slate-200'
@@ -376,11 +405,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                       strategy={verticalListSortingStrategy}
                     >
                       <div
-                        className={`relative flex-1 rounded-b-xl p-3 space-y-2.5 border border-t-0 ${
-                          columnTasks.length === 0
-                            ? 'min-h-[350px]'
-                            : 'min-h-[300px]'
-                        } ${
+                        className={`relative flex-1 rounded-b-xl p-3 space-y-2.5 border border-t-0 overflow-y-auto ${
                           theme === 'dark'
                             ? 'bg-slate-900/30 border-blue-500/20'
                             : 'bg-white border-slate-200'
@@ -446,7 +471,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
         </div>
 
         {/* Desktop: Responsive grid without horizontal scroll */}
-        <div className="hidden lg:grid lg:grid-cols-4 gap-3 xl:gap-4">
+        <div className="hidden lg:grid lg:grid-cols-4 gap-3 xl:gap-4 h-[calc(100vh-180px)]">
           {columns.map((column) => {
             const columnTasks = (tasks ?? [])
               .filter((task) => task.statusId === column.id)
@@ -458,9 +483,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                 id={column.id}
                 isOver={overId === column.id}
               >
-                <div className="flex flex-col">
+                <div className="flex flex-col h-full">
                   <div
-                    className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all ${
+                    className={`border-t-4 ${column.color} rounded-t-xl px-3 py-2.5 transition-all flex-shrink-0 ${
                       theme === 'dark'
                         ? 'bg-slate-900/60 border-b border-blue-500/20'
                         : 'bg-white border-b border-slate-200'
@@ -506,11 +531,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                     strategy={verticalListSortingStrategy}
                   >
                     <div
-                      className={`relative flex-1 rounded-b-xl p-3 space-y-2.5 max-h-[calc(100vh-300px)] border border-t-0 overflow-y-auto ${
-                        columnTasks.length === 0
-                          ? 'min-h-[450px]'
-                          : 'min-h-[400px]'
-                      } ${
+                      className={`relative flex-1 rounded-b-xl p-3 space-y-2.5 border border-t-0 overflow-y-auto ${
                         theme === 'dark'
                           ? 'bg-slate-900/30 border-blue-500/20 scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-slate-800/50'
                           : 'bg-white border-slate-200 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100'
