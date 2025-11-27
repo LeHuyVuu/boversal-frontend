@@ -507,17 +507,17 @@ export const Dashboard = React.memo(() => {
               </div>
 
               {/* Column 2: Completion Rate + Recent Tasks */}
-              <div className="space-y-3 flex flex-col h-full">
+              <div className="space-y-3 flex flex-col h-full overflow-hidden">
                 {/* Completion Rate */}
                 <AnimatedCard 
                   delay={0.3}
-                  className={`rounded-xl p-3 flex-1 min-h-0 ${
+                  className={`rounded-xl p-3 h-1/2 flex flex-col overflow-hidden ${
                     theme === 'dark'
                       ? 'bg-slate-900/60 border border-blue-500/20 backdrop-blur-sm'
                       : 'bg-white border border-slate-200'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-2 flex-shrink-0">
                     <h2 className={`text-sm font-semibold ${
                       theme === 'dark' ? 'text-cyan-100 neon-glow' : 'text-slate-800'
                     }`}>Completion</h2>
@@ -525,28 +525,28 @@ export const Dashboard = React.memo(() => {
                       theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
                     }`} />
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 flex-1 overflow-y-auto scrollbar-thin">
                     {/* Circular Progress */}
-                    <div className="flex items-center justify-center py-1">
-                      <div className="relative w-24 h-24">
-                        <svg className="transform -rotate-90 w-24 h-24">
+                    <div className="flex items-center justify-center">
+                      <div className="relative w-20 h-20">
+                        <svg className="transform -rotate-90 w-20 h-20">
                           <circle
-                            cx="48"
-                            cy="48"
-                            r="44"
+                            cx="40"
+                            cy="40"
+                            r="36"
                             stroke={theme === 'dark' ? 'rgba(100, 116, 139, 0.2)' : 'rgba(148, 163, 184, 0.3)'}
-                            strokeWidth="5"
+                            strokeWidth="4"
                             fill="none"
                           />
                           <circle
-                            cx="48"
-                            cy="48"
-                            r="44"
+                            cx="40"
+                            cy="40"
+                            r="36"
                             stroke="url(#gradient)"
-                            strokeWidth="5"
+                            strokeWidth="4"
                             fill="none"
-                            strokeDasharray={`${2 * Math.PI * 44}`}
-                            strokeDashoffset={`${2 * Math.PI * 44 * (1 - dashboardData.productivityChart.completionRate.completionPercentage / 100)}`}
+                            strokeDasharray={`${2 * Math.PI * 36}`}
+                            strokeDashoffset={`${2 * Math.PI * 36 * (1 - dashboardData.productivityChart.completionRate.completionPercentage / 100)}`}
                             strokeLinecap="round"
                             className="transition-all duration-1000 ease-out"
                           />
@@ -558,7 +558,7 @@ export const Dashboard = React.memo(() => {
                           </defs>
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center flex-col">
-                          <span className={`text-xl font-bold ${
+                          <span className={`text-lg font-bold ${
                             theme === 'dark' ? 'text-cyan-400' : 'text-blue-600'
                           }`}>
                             {dashboardData.productivityChart.completionRate.completionPercentage}%
@@ -568,59 +568,59 @@ export const Dashboard = React.memo(() => {
                     </div>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-2 gap-1.5">
-                      <div className={`p-1.5 rounded-lg ${
+                    <div className="grid grid-cols-2 gap-1">
+                      <div className={`p-1 rounded ${
                         theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
                       }`}>
-                        <p className={`text-[9px] font-medium ${
+                        <p className={`text-[8px] font-medium ${
                           theme === 'dark' ? 'text-cyan-400' : 'text-blue-600'
                         }`}>Total</p>
-                        <p className={`text-base font-bold ${
+                        <p className={`text-sm font-bold ${
                           theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
                         }`}>{dashboardData.productivityChart.completionRate.totalTasks}</p>
                       </div>
-                      <div className={`p-1.5 rounded-lg ${
+                      <div className={`p-1 rounded ${
                         theme === 'dark' ? 'bg-green-900/20' : 'bg-green-50'
                       }`}>
-                        <p className={`text-[9px] font-medium ${
+                        <p className={`text-[8px] font-medium ${
                           theme === 'dark' ? 'text-emerald-400' : 'text-green-600'
                         }`}>Done</p>
-                        <p className={`text-base font-bold ${
+                        <p className={`text-sm font-bold ${
                           theme === 'dark' ? 'text-emerald-100' : 'text-slate-800'
                         }`}>{dashboardData.productivityChart.completionRate.completedTasks}</p>
                       </div>
-                      <div className={`p-1.5 rounded-lg ${
+                      <div className={`p-1 rounded ${
                         theme === 'dark' ? 'bg-yellow-900/20' : 'bg-yellow-50'
                       }`}>
-                        <p className={`text-[9px] font-medium ${
+                        <p className={`text-[8px] font-medium ${
                           theme === 'dark' ? 'text-amber-400' : 'text-yellow-600'
                         }`}>Progress</p>
-                        <p className={`text-base font-bold ${
+                        <p className={`text-sm font-bold ${
                           theme === 'dark' ? 'text-amber-100' : 'text-slate-800'
                         }`}>{dashboardData.productivityChart.completionRate.inProgressTasks}</p>
                       </div>
-                      <div className={`p-1.5 rounded-lg ${
+                      <div className={`p-1 rounded ${
                         theme === 'dark' ? 'bg-slate-800/50' : 'bg-slate-100'
                       }`}>
-                      <p className={`text-[10px] font-medium ${
+                      <p className={`text-[8px] font-medium ${
                         theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
                       }`}>To Do</p>
-                      <p className={`text-base font-bold ${
+                      <p className={`text-sm font-bold ${
                         theme === 'dark' ? 'text-slate-100' : 'text-slate-800'
                       }`}>{dashboardData.productivityChart.completionRate.todoTasks}</p>
                     </div>
                   </div>
 
                   {/* Average Days */}
-                  <div className={`p-1.5 rounded-lg text-center ${
+                  <div className={`p-1 rounded text-center ${
                     theme === 'dark' 
                       ? 'bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border border-cyan-500/20' 
                       : 'bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200'
                   }`}>
-                    <p className={`text-[9px] font-medium ${
+                    <p className={`text-[8px] font-medium ${
                       theme === 'dark' ? 'text-cyan-300' : 'text-blue-700'
                     }`}>Avg Days</p>
-                    <p className={`text-base font-bold ${
+                    <p className={`text-sm font-bold ${
                       theme === 'dark' ? 'text-cyan-400' : 'text-blue-600'
                     }`}>{dashboardData.productivityChart.completionRate.averageDaysToComplete}</p>
                   </div>
@@ -630,13 +630,13 @@ export const Dashboard = React.memo(() => {
                 {/* Recent Tasks - Compact */}
                 <AnimatedCard 
                   delay={0.4}
-                  className={`rounded-xl p-3 flex-1 min-h-0 ${
+                  className={`rounded-xl p-2 h-1/2 flex flex-col overflow-hidden ${
                     theme === 'dark'
                       ? 'bg-slate-900/60 border border-blue-500/20 backdrop-blur-sm'
                       : 'bg-white border border-slate-200'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-1.5 flex-shrink-0">
                     <h2 className={`text-sm font-semibold ${
                       theme === 'dark' ? 'text-cyan-100 neon-glow' : 'text-slate-800'
                     }`}>Recent Tasks</h2>
@@ -644,7 +644,7 @@ export const Dashboard = React.memo(() => {
                       theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
                     }`} />
                   </div>
-                  <div className="space-y-2 overflow-y-auto scrollbar-thin" style={{maxHeight: 'calc(100% - 32px)'}}>
+                  <div className="space-y-1.5 flex-1 overflow-y-auto scrollbar-thin">
                     {dashboardData.recentTasks.length === 0 ? (
                       <p className={`text-center py-4 text-xs ${
                         theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
@@ -653,14 +653,14 @@ export const Dashboard = React.memo(() => {
                       dashboardData.recentTasks.slice(0, 5).map((task) => (
                         <div
                           key={task.id}
-                          className={`flex items-center space-x-2 p-2 rounded-lg transition-all cursor-pointer ${
+                          className={`flex items-center space-x-2 p-1.5 rounded transition-all cursor-pointer ${
                             theme === 'dark'
                               ? 'bg-blue-900/20 hover:bg-blue-900/40'
                               : 'bg-sky-50 hover:bg-sky-100'
                           }`}
                         >
                           <div
-                            className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
                               task.statusName === 'Done' || task.statusName === 'Completed'
                                 ? 'bg-emerald-400'
                                 : task.statusName === 'In Progress'
@@ -671,10 +671,10 @@ export const Dashboard = React.memo(() => {
                             }`}
                           />
                           <div className="flex-1 min-w-0">
-                            <p className={`text-xs font-medium truncate ${
+                            <p className={`text-[11px] font-medium truncate ${
                               theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
                             }`}>{task.title}</p>
-                            <p className={`text-[10px] ${
+                            <p className={`text-[9px] ${
                               theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
                             }`}>
                               {task.projectCode}

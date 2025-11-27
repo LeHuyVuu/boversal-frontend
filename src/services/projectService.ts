@@ -24,9 +24,13 @@ export const projectService = {
   // Get all projects with pagination (GET /api/Project?pageNumber=1&pageSize=10)
   async getProjects(
     pageNumber: number = 1,
-    pageSize: number = 10
+    pageSize: number = 10,
+    search?: string
   ): Promise<PaginatedResponse<ProjectDto>> {
-    const url = `/Project?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    let url = `/Project?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    if (search && search.trim()) {
+      url += `&search=${encodeURIComponent(search.trim())}`;
+    }
     const response = await apiClient.get<any>(url);
     
     // API trả về: { success, message, data: [...], pageNumber, pageSize, totalPages, totalRecords }

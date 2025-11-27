@@ -8,7 +8,9 @@ import {
   Calendar,
   Users,
   Target,
-  ExternalLink
+  ExternalLink,
+  Edit2,
+  Trash2
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'next/navigation';
@@ -19,6 +21,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { projectService } from '@/services/projectService';
 import type { ProjectDto } from '@/types/project';
 import CreateProjectModal from './CreateProjectModal';
+import { EditProjectModal } from './EditProjectModal';
+import { DeleteProjectModal } from './DeleteProjectModal';
 
 const formatDate = (dateString?: string | null) => {
   if (!dateString) return '—';
@@ -46,7 +50,12 @@ const getStatusColor = (statusId: number, isDark: boolean) => {
   }
 };
 
-const ProjectCard = React.memo<{ project: ProjectDto; index: number }>(({ project, index }) => {
+const ProjectCard = React.memo<{ 
+  project: ProjectDto; 
+  index: number;
+  onEdit: (project: ProjectDto) => void;
+  onDelete: (project: ProjectDto) => void;
+}>(({ project, index, onEdit, onDelete }) => {
   const { theme } = useTheme();
   
   return (
@@ -71,16 +80,47 @@ const ProjectCard = React.memo<{ project: ProjectDto; index: number }>(({ projec
             </span>
           </div>
         </div>
-        <Link
-          href={`/workspace/project/${project.id}`}
-          className={`p-2 rounded-lg transition-all ${
-            theme === 'dark'
-              ? 'hover:bg-blue-900/30 text-cyan-400'
-              : 'hover:bg-sky-50 text-sky-600'
-          }`}
-        >
-          <ExternalLink className="w-5 h-5" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              onEdit(project);
+            }}
+            className={`p-2 rounded-lg transition-all ${
+              theme === 'dark'
+                ? 'hover:bg-blue-900/30 text-cyan-400 hover:text-cyan-300'
+                : 'hover:bg-sky-50 text-sky-600 hover:text-sky-700'
+            }`}
+            title="Edit project"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              onDelete(project);
+            }}
+            className={`p-2 rounded-lg transition-all ${
+              theme === 'dark'
+                ? 'hover:bg-red-900/30 text-red-400 hover:text-red-300'
+                : 'hover:bg-red-50 text-red-600 hover:text-red-700'
+            }`}
+            title="Delete project"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <Link
+            href={`/workspace/project/${project.id}`}
+            className={`p-2 rounded-lg transition-all ${
+              theme === 'dark'
+                ? 'hover:bg-blue-900/30 text-cyan-400'
+                : 'hover:bg-sky-50 text-sky-600'
+            }`}
+            title="View project details"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
 
       <p className={`text-sm mb-4 line-clamp-2 ${
@@ -121,6 +161,9 @@ export function Projects() {
   const debouncedSearch = useDebounce(searchTerm, 300);
   const [statusFilter, setStatusFilter] = useState<number | 'all'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<ProjectDto | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -174,6 +217,42 @@ export function Projects() {
       console.error('Failed to refresh projects');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (project: ProjectDto) => {
+    setSelectedProject(project);
+    setShowEditModal(true);
+  };
+
+  const handleDelete = (project: ProjectDto) => {
+    setSelectedProject(project);
+    setShowDeleteModal(true);
+  };
+
+  const handleEditSuccess = async () => {
+    setShowEditModal(false);
+    setSelectedProject(null);
+    // Refresh project list
+    try {
+      const response = await projectService.getProjects(pageNumber, pageSize, debouncedSearch);
+      setProjects(response.data || []);
+      setTotalPages(response.totalPages || 1);
+    } catch (e) {
+      console.error('Failed to refresh projects');
+    }
+  };
+
+  const handleDeleteSuccess = async () => {
+    setShowDeleteModal(false);
+    setSelectedProject(null);
+    // Refresh project list
+    try {
+      const response = await projectService.getProjects(pageNumber, pageSize, debouncedSearch);
+      setProjects(response.data || []);
+      setTotalPages(response.totalPages || 1);
+    } catch (e) {
+      console.error('Failed to refresh projects');
     }
   };
 
@@ -245,7 +324,7 @@ export function Projects() {
         </div>
 
         {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[500px]">
             {[...Array(6)].map((_, i) => (
               <CardSkeleton key={i} />
             ))}
@@ -253,7 +332,7 @@ export function Projects() {
         )}
 
         {error && !loading && (
-          <div className={`text-center py-16 rounded-xl ${
+          <div className={`text-center py-16 rounded-xl min-h-[500px] flex flex-col items-center justify-center ${
             theme === 'dark' ? 'bg-slate-900/60 border border-blue-500/20' : 'bg-white border border-slate-200'
           }`}>
             <Target className={`w-16 h-16 mx-auto mb-4 ${
@@ -270,12 +349,18 @@ export function Projects() {
 
         {/* Projects Grid */}
         {!loading && !error && (
-          <>
+          <div className="min-h-[500px]">
             {filteredProjects.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProjects.map((project, index) => (
-                    <ProjectCard key={project.id} project={project} index={index} />
+                    <ProjectCard 
+                      key={project.id} 
+                      project={project} 
+                      index={index}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
                   ))}
                 </div>
 
@@ -313,7 +398,7 @@ export function Projects() {
                 )}
               </>
             ) : (
-              <div className={`text-center py-16 rounded-xl ${
+              <div className={`text-center py-16 rounded-xl min-h-[500px] flex flex-col items-center justify-center ${
                 theme === 'dark' ? 'bg-slate-900/60 border border-blue-500/20' : 'bg-white border border-slate-200'
               }`}>
                 <Target className={`w-16 h-16 mx-auto mb-4 ${
@@ -327,7 +412,7 @@ export function Projects() {
                 }`}>Try adjusting your search or filter criteria.</p>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
@@ -336,6 +421,32 @@ export function Projects() {
         <CreateProjectModal
           onClose={() => setShowCreateModal(false)}
           onSuccess={handleCreateSuccess}
+        />
+      )}
+
+      {/* Edit Project Modal */}
+      {showEditModal && selectedProject && (
+        <EditProjectModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedProject(null);
+          }}
+          onSuccess={handleEditSuccess}
+          project={selectedProject}
+        />
+      )}
+
+      {/* Delete Project Modal */}
+      {showDeleteModal && selectedProject && (
+        <DeleteProjectModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setSelectedProject(null);
+          }}
+          onSuccess={handleDeleteSuccess}
+          project={selectedProject}
         />
       )}
     </div>
