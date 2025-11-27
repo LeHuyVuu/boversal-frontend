@@ -17,10 +17,17 @@ export function useCreateProject() {
         throw new Error(response.message);
       }
 
+      (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✨ Project created successfully!', life: 3000 });
       return response.data;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to create project';
+    } catch (err: any) {
+      // Extract errors from error response
+      const apiErrors = err?.response?.data?.errors;
+      const errorMsg = apiErrors && Array.isArray(apiErrors) && apiErrors.length > 0
+        ? apiErrors.join('\n')
+        : err?.response?.data?.message || (err instanceof Error ? err.message : 'Failed to create project');
+      
       setError(errorMsg);
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 4000 });
       return null;
     } finally {
       setLoading(false);

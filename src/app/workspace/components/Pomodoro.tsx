@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import toast, { Toaster } from 'react-hot-toast';
 import { 
   Timer, 
   Play, 
@@ -245,12 +246,54 @@ export default function Pomodoro() {
       // Auto switch to break
       if (newCompletedSessions % settings.sessionsUntilLongBreak === 0) {
         switchMode('longBreak');
+        toast.success('🎉 Great work! Time for a long break!', {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            background: theme === 'dark' ? '#1e293b' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#0f172a',
+            border: theme === 'dark' ? '1px solid #475569' : '1px solid #e2e8f0',
+            borderRadius: '12px',
+            padding: '16px',
+            fontSize: '14px',
+            fontWeight: '600',
+          },
+          icon: '🧠',
+        });
       } else {
         switchMode('shortBreak');
+        toast.success('✨ Focus session complete! Take a short break.', {
+          duration: 4000,
+          position: 'top-center',
+          style: {
+            background: theme === 'dark' ? '#1e293b' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#0f172a',
+            border: theme === 'dark' ? '1px solid #475569' : '1px solid #e2e8f0',
+            borderRadius: '12px',
+            padding: '16px',
+            fontSize: '14px',
+            fontWeight: '600',
+          },
+          icon: '☕',
+        });
       }
     } else {
       // After break, switch to work
       switchMode('work');
+      toast.success('💪 Break time over! Ready to focus?', {
+        duration: 4000,
+        position: 'top-center',
+        style: {
+          background: theme === 'dark' ? '#1e293b' : '#ffffff',
+          color: theme === 'dark' ? '#ffffff' : '#0f172a',
+          border: theme === 'dark' ? '1px solid #475569' : '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+        icon: '🎯',
+      });
     }
 
     // Show browser notification
@@ -260,7 +303,7 @@ export default function Pomodoro() {
         icon: '/favicon.ico',
       });
     }
-  }, [mode, completedSessions, selectedTask, settings, playNotificationSound]);
+  }, [mode, completedSessions, selectedTask, settings, playNotificationSound, theme]);
 
   // Switch mode
   const switchMode = (newMode: PomodoroMode) => {
@@ -289,6 +332,24 @@ export default function Pomodoro() {
     setStatus('running');
     playNotificationSound('start');
     setShowMiniWidget(true);
+
+    // Show toast notification
+    toast(
+      mode === 'work' ? '🧠 Focus mode activated!' : '☕ Break time started!',
+      {
+        duration: 2000,
+        position: 'top-center',
+        style: {
+          background: theme === 'dark' ? '#1e293b' : '#ffffff',
+          color: theme === 'dark' ? '#ffffff' : '#0f172a',
+          border: theme === 'dark' ? '1px solid #475569' : '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '12px 20px',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      }
+    );
 
     // Request notification permission
     if ('Notification' in window && Notification.permission === 'default') {
@@ -561,6 +622,34 @@ export default function Pomodoro() {
 
   return (
     <div className="h-full flex flex-col">
+      {/* Toast Container */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: theme === 'dark' ? '#1e293b' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#0f172a',
+            border: theme === 'dark' ? '1px solid #475569' : '1px solid #e2e8f0',
+            borderRadius: '12px',
+            padding: '16px',
+            fontSize: '14px',
+            fontWeight: '600',
+            boxShadow: theme === 'dark' 
+              ? '0 10px 40px rgba(0, 0, 0, 0.5)' 
+              : '0 10px 40px rgba(0, 0, 0, 0.1)',
+          },
+          success: {
+            iconTheme: {
+              primary: theme === 'dark' ? '#22d3ee' : '#0ea5e9',
+              secondary: theme === 'dark' ? '#1e293b' : '#ffffff',
+            },
+          },
+        }}
+      />
+
       {/* Floating Mini Widget */}
       {showMiniWidget && status !== 'idle' && (
         <div className={`fixed bottom-6 right-6 z-50 rounded-2xl shadow-2xl backdrop-blur-xl border transition-all duration-300 ${

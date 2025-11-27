@@ -23,7 +23,7 @@ export default function EditTaskModal({ task, onClose, onSuccess }: EditTaskModa
     statusId: task.statusId,
     title: task.title,
     description: task.description || '',
-    priority: (task.priority?.toLowerCase() || 'medium') as 'low' | 'medium' | 'high' | 'urgent',
+    priority: (task.priority?.toLowerCase() || 'medium') as 'low' | 'medium' | 'high' | 'emergency',
     dueDate: task.dueDate ? task.dueDate.split('T')[0] : null,
     orderIndex: task.orderIndex,
     assigneeIds: task.assignees?.map(a => a.userId) || []
@@ -136,13 +136,22 @@ export default function EditTaskModal({ task, onClose, onSuccess }: EditTaskModa
       const result = await taskService.updateTaskFull(formData.id, updateData);
       console.log('Update Result:', result);
       
+      (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✅ Task updated successfully!', life: 3000 });
       onSuccess();
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('=== UPDATE ERROR ===');
       console.error('Error object:', err);
       console.error('Error message:', err instanceof Error ? err.message : 'Unknown error');
-      setError(err instanceof Error ? err.message : 'Failed to update task');
+      
+      // Extract errors from error response
+      const apiErrors = err?.response?.data?.errors;
+      const errorMsg = apiErrors && Array.isArray(apiErrors) && apiErrors.length > 0
+        ? apiErrors.join('\n')
+        : err?.response?.data?.message || (err instanceof Error ? err.message : 'Failed to update task');
+      
+      setError(errorMsg);
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 4000 });
     } finally {
       setLoading(false);
     }
@@ -276,7 +285,7 @@ export default function EditTaskModal({ task, onClose, onSuccess }: EditTaskModa
                   Priority <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {(['low', 'medium', 'high', 'urgent'] as const).map((p) => (
+                  {(['low', 'medium', 'high', 'emergency'] as const).map((p) => (
                     <button
                       key={p}
                       type="button"

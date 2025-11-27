@@ -17,7 +17,7 @@ interface CreateTaskModalProps {
 interface TaskFormData {
   title: string;
   description: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'emergency';
   dueDate: string;
   assigneeIds: number[];
 }
@@ -131,17 +131,27 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       const response = await taskService.createTask(requestData);
 
       if (response.success) {
+        (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✅ Task created successfully!', life: 3000 });
+        setLoading(false);
         onClose();
         onTaskCreated?.();
       } else {
-        setErrors({ title: response.message || 'Tạo task thất bại' });
+        // Extract errors from response
+        const errorMsg = response.errors && Array.isArray(response.errors) && response.errors.length > 0
+          ? response.errors.join('\n')
+          : response.message || 'Tạo task thất bại';
+        setErrors({ title: errorMsg });
+        (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 4000 });
+        setLoading(false);
       }
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.errors 
-        ? Object.values(error.response.data.errors).flat().join(', ')
+      // Extract errors from error response
+      const apiErrors = error?.response?.data?.errors;
+      const errorMessage = apiErrors && Array.isArray(apiErrors) && apiErrors.length > 0
+        ? apiErrors.join('\n')
         : error?.response?.data?.message || error?.message || 'Lỗi kết nối server';
       setErrors({ title: errorMessage });
-    } finally {
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMessage, life: 4000 });
       setLoading(false);
     }
   };
@@ -151,7 +161,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       'low': 1,
       'medium': 2,
       'high': 3,
-      'urgent': 4
+      'emergency': 4
     };
     return priorityMap[priority] || 2;
   };
@@ -161,7 +171,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       'low': 'bg-green-500 hover:bg-green-600',
       'medium': 'bg-blue-500 hover:bg-blue-600',
       'high': 'bg-orange-500 hover:bg-orange-600',
-      'urgent': 'bg-red-500 hover:bg-red-600',
+      'emergency': 'bg-red-500 hover:bg-red-600',
     };
     return colors[priority as keyof typeof colors] || colors.medium;
   };
@@ -298,7 +308,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                     Priority
                   </label>
                   <div className="flex gap-2">
-                    {(['low', 'medium', 'high', 'urgent'] as const).map((priority) => (
+                    {(['low', 'medium', 'high', 'emergency'] as const).map((priority) => (
                       <button
                         key={priority}
                         type="button"

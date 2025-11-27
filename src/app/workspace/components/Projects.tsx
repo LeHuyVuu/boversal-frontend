@@ -17,7 +17,7 @@ import { AnimatedButton } from '@/components/AnimatedButton';
 import { CardSkeleton } from '@/components/LoadingSkeleton';
 import { useDebounce } from '@/hooks/useDebounce';
 import { projectService } from '@/services/projectService';
-import { ProjectDto } from '@/types/project';
+import type { ProjectDto } from '@/types/project';
 import CreateProjectModal from './CreateProjectModal';
 
 const formatDate = (dateString?: string | null) => {
@@ -170,6 +170,7 @@ export function Projects() {
       setTotalPages(response.totalPages || 1);
       setPageNumber(1); // Reset to first page to see new project
     } catch (e) {
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: 'Failed to refresh project list', life: 3000 });
       console.error('Failed to refresh projects');
     } finally {
       setLoading(false);

@@ -63,7 +63,7 @@ export interface UpdateTaskDto {
   statusId: number | null;
   title: string;
   description: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'emergency';
   dueDate: string | null;
   orderIndex: number;
   assigneeIds: number[];

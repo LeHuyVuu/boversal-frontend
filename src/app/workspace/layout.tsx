@@ -1,16 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { GalaxyBackground } from '@/components/GalaxyBackground';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { Toast } from 'primereact/toast';
+import 'primereact/resources/themes/lara-dark-cyan/theme.css';
+import 'primeicons/primeicons.css';
 
 type Section = 'dashboard' | 'projects' | 'issues' | 'calendar' | 'meetings' | 'pomodoro' | 'storage' | 'documents';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const toast = useRef<any>(null);
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Make toast available globally
+    if (typeof window !== 'undefined') {
+      (window as any).toast = toast.current;
+    }
+  }, []);
 
   const handleSectionChange = (section: Section) => {
     setActiveSection(section);
@@ -20,6 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
       <GalaxyBackground />
+      <Toast ref={toast} position="top-right" />
       <div className="flex h-screen relative z-10">
         <Sidebar 
           activeSection={activeSection} 

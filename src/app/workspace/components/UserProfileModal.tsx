@@ -98,10 +98,13 @@ export default function UserProfileModal({ onClose }: UserProfileModalProps) {
     try {
       const response = await userService.updateProfile(editedProfile);
       setProfile(response.data);
+      (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✨ Profile updated successfully!', life: 3000 });
       setSuccess('Profile updated successfully');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update profile');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to update profile';
+      setError(errorMsg);
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 3000 });
     } finally {
       setSaving(false);
     }
@@ -137,20 +140,25 @@ export default function UserProfileModal({ onClose }: UserProfileModalProps) {
     setSuccess(null);
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setError('Passwords do not match');
+      const errorMsg = 'Passwords do not match';
+      setError(errorMsg);
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 3000 });
       setPasswordLoading(false);
       return;
     }
 
     const validation = validatePassword(passwordForm.newPassword);
     if (!validation.valid) {
-      setError(validation.errors.join(', '));
+      const errorMsg = validation.errors.join(', ');
+      setError(errorMsg);
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 3000 });
       setPasswordLoading(false);
       return;
     }
 
     try {
       await userService.changePassword(passwordForm);
+      (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '🔒 Password changed successfully!', life: 3000 });
       setSuccess('Password changed successfully');
       setPasswordForm({
         currentPassword: '',
@@ -159,7 +167,9 @@ export default function UserProfileModal({ onClose }: UserProfileModalProps) {
       });
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to change password');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to change password';
+      setError(errorMsg);
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 3000 });
     } finally {
       setPasswordLoading(false);
     }

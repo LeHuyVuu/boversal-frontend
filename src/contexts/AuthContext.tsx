@@ -67,14 +67,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (response.success) {
         await checkAuth(); // Fetch user data after successful login
+        (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '🎉 Đăng nhập thành công!', life: 3000 });
         return { success: true };
       }
       
+      // Extract errors from response
+      const errorMsg = response.errors && Array.isArray(response.errors) && response.errors.length > 0
+        ? response.errors.join('\n')
+        : response.message || 'Đăng nhập thất bại';
+      
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 4000 });
       return {
         success: false,
         message: response.message || 'Đăng nhập thất bại'
       };
     } catch (error: any) {
+      // Extract errors from error response
+      const apiErrors = error?.response?.data?.errors;
+      const errorMsg = apiErrors && Array.isArray(apiErrors) && apiErrors.length > 0
+        ? apiErrors.join('\n')
+        : error?.response?.data?.message || error?.message || 'Lỗi kết nối server';
+      
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 4000 });
       return {
         success: false,
         message: error.message || 'Lỗi kết nối server'
@@ -91,14 +105,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       if (response.success) {
+        (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✨ Đăng ký thành công! Vui lòng đăng nhập.', life: 3000 });
         return { success: true };
       }
       
+      // Extract errors from response
+      const errorMsg = response.errors && Array.isArray(response.errors) && response.errors.length > 0
+        ? response.errors.join('\n')
+        : response.message || 'Đăng ký thất bại';
+      
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 4000 });
       return {
         success: false,
         message: response.message || 'Đăng ký thất bại'
       };
     } catch (error: any) {
+      // Extract errors from error response
+      const apiErrors = error?.response?.data?.errors;
+      const errorMsg = apiErrors && Array.isArray(apiErrors) && apiErrors.length > 0
+        ? apiErrors.join('\n')
+        : error?.response?.data?.message || error?.message || 'Lỗi kết nối server';
+      
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: errorMsg, life: 4000 });
       return {
         success: false,
         message: error.message || 'Lỗi kết nối server'
@@ -109,8 +137,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await apiClient.post<null>('/Auth/logout', {});
+      (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '👋 Đăng xuất thành công!', life: 3000 });
     } catch (error) {
       // Silently fail - will redirect anyway
+      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: 'Có lỗi khi đăng xuất', life: 3000 });
     } finally {
       setUser(null);
       
