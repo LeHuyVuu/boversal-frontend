@@ -151,7 +151,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
                 </label>
                 <input
                   type="date"
-                  value={formData.startDate}
+                  value={formData.startDate || ''}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                   className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors ${
                     theme === 'dark'
@@ -170,7 +170,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
                 </label>
                 <input
                   type="date"
-                  value={formData.endDate}
+                  value={formData.endDate || ''}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                   className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors ${
                     theme === 'dark'
