@@ -178,7 +178,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             </label>
             <input
               type="url"
-              value={formData.demoUrl}
+              value={formData.demoUrl || ''}
               onChange={(e) => setFormData({ ...formData, demoUrl: e.target.value })}
               className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                 theme === 'dark'
@@ -200,7 +200,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
               <div className="relative">
                 <input
                   type="date"
-                  value={formData.startDate}
+                  value={formData.startDate || ''}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                   className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                     theme === 'dark'
@@ -223,7 +223,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
               <div className="relative">
                 <input
                   type="date"
-                  value={formData.endDate}
+                  value={formData.endDate || ''}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                   className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                     theme === 'dark'
@@ -247,7 +247,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             </label>
             <input
               type="text"
-              value={formData.shortIntro}
+              value={formData.shortIntro || ''}
               onChange={(e) => setFormData({ ...formData, shortIntro: e.target.value })}
               className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                 theme === 'dark'
@@ -267,7 +267,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             </label>
             <input
               type="text"
-              value={formData.highlight}
+              value={formData.highlight || ''}
               onChange={(e) => setFormData({ ...formData, highlight: e.target.value })}
               className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors ${
                 theme === 'dark'
@@ -286,7 +286,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
               Description
             </label>
             <textarea
-              value={formData.description}
+              value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
               className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors resize-none ${

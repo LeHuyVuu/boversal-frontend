@@ -281,7 +281,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   Description
                 </label>
                 <textarea
-                  value={formData.description}
+                  value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Add description (optional)..."
                   rows={4}
@@ -339,7 +339,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   </label>
                   <input
                     type="date"
-                    value={formData.dueDate}
+                    value={formData.dueDate || ''}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
                     className={`w-full px-4 py-2.5 rounded-lg border transition-all ${
                       theme === 'dark'

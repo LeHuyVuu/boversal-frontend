@@ -278,7 +278,7 @@ const CreateMeetingModal: React.FC<CreateMeetingModalProps> = ({
               Description
             </label>
             <textarea
-              value={formData.description}
+              value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className={`w-full px-4 py-2 rounded-lg border transition-colors resize-none ${
                 theme === 'dark'
@@ -353,7 +353,7 @@ const CreateMeetingModal: React.FC<CreateMeetingModalProps> = ({
             </label>
             <input
               type="url"
-              value={formData.meetingLink}
+              value={formData.meetingLink || ''}
               onChange={(e) => setFormData({ ...formData, meetingLink: e.target.value })}
               className={`w-full px-4 py-2 rounded-lg border transition-colors ${
                 theme === 'dark'

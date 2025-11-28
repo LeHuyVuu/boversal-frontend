@@ -257,7 +257,7 @@ export default function EditTaskModal({ task, onClose, onSuccess }: EditTaskModa
                 Description
               </label>
               <textarea
-                value={formData.description}
+                value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Enter task description"
                 maxLength={5000}

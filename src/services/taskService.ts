@@ -5,6 +5,7 @@ interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
+  errors?: string[];
   pageNumber?: number;
   pageSize?: number;
   totalPages?: number;
