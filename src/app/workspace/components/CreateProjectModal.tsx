@@ -191,7 +191,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
               </label>
               <input
                 type="url"
-                value={formData.demoUrl}
+                value={formData.demoUrl || ''}
                 onChange={(e) => setFormData({ ...formData, demoUrl: e.target.value })}
                 placeholder="https://demo.yourproject.com"
                 maxLength={500}
@@ -212,7 +212,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
               </label>
               <input
                 type="text"
-                value={formData.shortIntro}
+                value={formData.shortIntro || ''}
                 onChange={(e) => setFormData({ ...formData, shortIntro: e.target.value })}
                 placeholder="A brief introduction to your project"
                 maxLength={500}
@@ -233,7 +233,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
               </label>
               <input
                 type="text"
-                value={formData.highlight}
+                value={formData.highlight || ''}
                 onChange={(e) => setFormData({ ...formData, highlight: e.target.value })}
                 placeholder="Key features or highlights"
                 maxLength={500}
@@ -253,7 +253,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
                 Description
               </label>
               <textarea
-                value={formData.description}
+                value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Detailed description of your project"
                 rows={4}
