@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Edit3, Download, Mail, Phone, Loader2 } from 'lucide-react';
-import { projectService, Project } from '@/services/projectService';
+import { projectService } from '@/services/projectService';
+import type { ProjectDto } from '@/types/project';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface ProjectDetailProps {
@@ -11,7 +12,7 @@ interface ProjectDetailProps {
 
 const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId }) => {
   const { theme } = useTheme();
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<ProjectDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,12 +119,12 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId }) => {
               }`}>
                 <div
                   className={theme === 'dark' ? 'bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all' : 'bg-gradient-to-r from-sky-500 to-blue-500 h-2 rounded-full transition-all'}
-                  style={{ width: `${project.progress || 0}%` }}
+                  style={{ width: `0%` }}
                 />
               </div>
               <span className={`text-sm font-semibold ${
                 theme === 'dark' ? 'text-cyan-400' : 'text-blue-600'
-              }`}>{project.progress || 0}%</span>
+              }`}>0%</span>
             </div>
           </div>
 
@@ -178,8 +179,8 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId }) => {
             </div>
           </div>
 
-          {/* Project Manager */}
-          {project.managerId && (
+          {/* Project Manager - Commented out as managerId not in ProjectDto */}
+          {/* {project.managerId && (
             <div className={`p-3 rounded-lg ${
               theme === 'dark' ? 'bg-slate-800/50' : 'bg-slate-50'
             }`}>
@@ -201,10 +202,10 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId }) => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
-          {/* Contact */}
-          {project.managerId && (project.managerId.email || project.managerId.phone) && (
+          {/* Contact - Commented out as managerId not in ProjectDto */}
+          {/* {project.managerId && (project.managerId.email || project.managerId.phone) && (
             <div className={`p-3 rounded-lg ${
               theme === 'dark' ? 'bg-slate-800/50' : 'bg-slate-50'
             }`}>
@@ -238,7 +239,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ projectId }) => {
                 )}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Description */}

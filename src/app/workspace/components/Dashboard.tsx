@@ -139,8 +139,8 @@ export const Dashboard = React.memo(() => {
   const stats = useMemo(() => {
     if (!dashboardData) return [];
     
-    const taskTrend = dashboardData.stats.taskChangeVsLastMonth >= 0 ? 'up' : 'down';
-    const projectTrend = dashboardData.stats.projectChangeVsLastMonth >= 0 ? 'up' : 'down';
+    const taskTrend: 'up' | 'down' = dashboardData.stats.taskChangeVsLastMonth >= 0 ? 'up' : 'down';
+    const projectTrend: 'up' | 'down' = dashboardData.stats.projectChangeVsLastMonth >= 0 ? 'up' : 'down';
     
     return [
       {
@@ -163,7 +163,7 @@ export const Dashboard = React.memo(() => {
         title: 'Team Members',
         value: dashboardData.stats.teamMembers,
         change: '+0',
-        trend: 'up',
+        trend: 'up' as const,
         icon: Users,
         color: 'text-violet-600'
       }

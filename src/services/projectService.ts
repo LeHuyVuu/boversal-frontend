@@ -6,12 +6,12 @@ import type {
   PaginatedResponse 
 } from '@/types/project';
 
-// API Response wrapper
+// API Response wrapper - matches api-client.ts
 interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
-  errors?: Record<string, string[]>;
+  errors?: string[] | Record<string, string[]> | null;
 }
 
 // Project service
@@ -31,7 +31,7 @@ export const projectService = {
     if (search && search.trim()) {
       url += `&search=${encodeURIComponent(search.trim())}`;
     }
-    const response = await apiClient.get<any>(url);
+    const response: any = await apiClient.get<any>(url);
     
     // API trả về: { success, message, data: [...], pageNumber, pageSize, totalPages, totalRecords }
     if (response.success && response.data) {

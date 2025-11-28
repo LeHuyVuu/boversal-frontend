@@ -194,7 +194,7 @@ export default function Pomodoro() {
     if (pipWindowRef.current && !pipWindowRef.current.closed) {
       const pipWindow = pipWindowRef.current;
       const timerDisplay = pipWindow.document.getElementById('timer-display');
-      const progressCircle = pipWindow.document.getElementById('progress-circle') as SVGCircleElement;
+      const progressCircle = pipWindow.document.getElementById('progress-circle');
       
       if (timerDisplay) {
         const mins = Math.floor(timeLeft / 60);
@@ -202,7 +202,7 @@ export default function Pomodoro() {
         timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
       }
       
-      if (progressCircle) {
+      if (progressCircle && progressCircle instanceof SVGCircleElement) {
         const totalDuration = 
           mode === 'work' ? settings.workDuration :
           mode === 'shortBreak' ? settings.shortBreakDuration :

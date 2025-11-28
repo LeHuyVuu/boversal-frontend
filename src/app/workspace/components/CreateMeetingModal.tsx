@@ -12,7 +12,7 @@ interface CreateMeetingModalProps {
   onClose: () => void;
   onSubmit: () => void;
   meeting?: Meeting | null;
-  toast: React.RefObject<Toast>;
+  toast: React.RefObject<Toast | null>;
 }
 
 const CreateMeetingModal: React.FC<CreateMeetingModalProps> = ({

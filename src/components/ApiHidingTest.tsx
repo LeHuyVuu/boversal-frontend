@@ -5,7 +5,7 @@
 
 'use client';
 import { useState } from 'react';
-import { apiClient, apiClientDirect } from '@/lib/api-client';
+import { apiClient } from '@/lib/api-client';
 import { disableApiHiding } from '@/lib/api-debug';
 
 export function ApiHidingTest() {
@@ -29,8 +29,8 @@ export function ApiHidingTest() {
   const testVisibleCall = async () => {
     setLoading(true);
     try {
-      // This will be visible in Network tab
-      const response = await apiClientDirect.get('/test-endpoint');
+      // This will be visible in Network tab - using apiClient directly
+      const response = await apiClient.get('/test-endpoint');
       setResult('✅ Direct call successful! Check Network tab - you should see the actual endpoint');
       console.log('Direct API response:', response);
     } catch (error) {
