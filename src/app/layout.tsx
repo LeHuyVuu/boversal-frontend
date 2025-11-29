@@ -72,7 +72,9 @@ export default function RootLayout({
         <meta name="twitter:image" content={OG_IMAGE} />
 
         {/* ===================== FAVICON ===================== */}
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="shortcut icon" href="/logo.png" />
       </head>
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
