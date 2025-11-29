@@ -247,7 +247,7 @@ export const Dashboard = React.memo(() => {
                       theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
                     }`} />
                   </div>
-                  <div className="h-[130px]">
+                  <div className="h-32 sm:h-40 md:h-48 lg:h-[130px]">
                     <Line
                       data={{
                         labels: dashboardData.productivityChart.monthlyCompletion.map(m => m.month),
@@ -354,7 +354,7 @@ export const Dashboard = React.memo(() => {
                         theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
                       }`} />
                     </div>
-                    <div className="h-[calc(100%-36px)]">
+                    <div className="h-32 sm:h-40 md:h-48 lg:h-[calc(100%-36px)]">
                       <Bar
                         data={{
                           labels: ['Low', 'Medium', 'High', 'Emergency'],
@@ -442,7 +442,7 @@ export const Dashboard = React.memo(() => {
                         theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
                       }`} />
                     </div>
-                    <div className="h-[calc(100%-36px)] flex items-center justify-center">
+                    <div className="h-32 sm:h-40 md:h-48 lg:h-[calc(100%-36px)] flex items-center justify-center">
                       <Doughnut
                         data={{
                           labels: dashboardData.productivityChart.tasksByStatus.map(s => s.statusName),
