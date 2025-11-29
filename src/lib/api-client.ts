@@ -167,6 +167,8 @@ const GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost
 const PROJECT_SERVICE = process.env.NEXT_PUBLIC_PROJECT_SERVICE || '/project-management-service';
 const API_URL = `${GATEWAY_URL}${PROJECT_SERVICE}`;
 
-export const apiClient = new ApiClient(API_URL, false);
+// Export a client that routes through the Next.js proxy by default so
+// credentials/cookies are forwarded from the browser to backend services.
+export const apiClient = new ApiClient(API_URL, true);
 
 export type { ApiResponse };
