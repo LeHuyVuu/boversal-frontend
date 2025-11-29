@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Boversal preview image">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1">
+      <stop offset="0%" stop-color="#0b1220" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0ea5a4" />
+    </linearGradient>
+    <radialGradient id="neb" cx="30%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.95" />
+      <stop offset="50%" stop-color="#4f46e5" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.35" />
+    </radialGradient>
+  </defs>
+
+  <!-- Full-bleed background for consistent social preview -->
+  <rect width="100%" height="100%" fill="url(#bg)" />
+
+  <!-- nebula overlays -->
+  <g opacity="0.95">
+    <ellipse cx="320" cy="210" rx="420" ry="160" fill="url(#neb)" opacity="0.65" />
+    <ellipse cx="800" cy="360" rx="360" ry="120" fill="url(#neb)" opacity="0.55" />
+  </g>
+
+  <!-- stars -->
+  <g fill="#ffffff" opacity="0.9">
+    <circle cx="80" cy="80" r="1.5" />
+    <circle cx="150" cy="40" r="1" />
+    <circle cx="230" cy="120" r="1.2" />
+    <circle cx="980" cy="60" r="1.3" />
+    <circle cx="1050" cy="180" r="1" />
+    <circle cx="560" cy="480" r="1.6" />
+  </g>
+
+  <!-- Title (note: with transparent background the text will appear over page background) -->
+  <text x="80" y="360" font-family="Helvetica, Arial, sans-serif" font-size="72" fill="#ffffff" font-weight="700">Boversal</text>
+  <text x="80" y="430" font-family="Helvetica, Arial, sans-serif" font-size="32" fill="#dbeafe">Quản lý công việc &amp; cộng tác</text>
+
+  <!-- brand mark -->
+  <g transform="translate(980,80)">
+    <rect width="160" height="160" rx="24" fill="url(#neb)" opacity="0.7" />
+    <text x="80" y="98" font-family="Helvetica, Arial, sans-serif" font-size="72" fill="#fff" text-anchor="middle">B</text>
+  </g>
+</svg>

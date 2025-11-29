@@ -33,7 +33,10 @@ export default function RootLayout({
 
   const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Boversal';
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://boversal.id.vn';
-  const OG_IMAGE = `${APP_URL}/og-image.png`;
+  // Add a small cache-busting version to force browsers to fetch updated icons
+  const ASSET_VERSION = 'v7';
+  const OG_IMAGE = `${APP_URL}/og-image.svg?${ASSET_VERSION}`;
+  const LOGO_SVG = `${APP_URL}/logo.svg?${ASSET_VERSION}`;
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -72,9 +75,12 @@ export default function RootLayout({
         <meta name="twitter:image" content={OG_IMAGE} />
 
         {/* ===================== FAVICON ===================== */}
-        <link rel="icon" href="/logo.png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
-        <link rel="shortcut icon" href="/logo.png" />
+        {/* Favicon: serve SVG with explicit type and size hints so browsers rasterize larger */}
+        <link rel="icon" type="image/svg+xml" href="/logo.svg?${ASSET_VERSION}" />
+        {/* Provide a sized icon hint (some browsers prefer PNG, but SVG with sizes helps) */}
+        <link rel="icon" href="/logo.svg?${ASSET_VERSION}" sizes="128x128" />
+        <link rel="apple-touch-icon" href="/logo.svg?${ASSET_VERSION}" sizes="128x128" />
+        <link rel="shortcut icon" href="/logo.svg?${ASSET_VERSION}" />
       </head>
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

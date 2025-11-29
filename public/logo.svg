@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Boversal logo">
+  <defs>
+    <radialGradient id="lg" cx="40%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="40%" stop-color="#fffb7d" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.9" />
+    </radialGradient>
+    <radialGradient id="neb" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.95" />
+      <stop offset="60%" stop-color="#06b6d4" stop-opacity="0.6" />
+    </radialGradient>
+  </defs>
+
+  <!-- transparent background (no full-bleed rect) -->
+
+  <!-- subtle nebula / glow behind mark (scaled for larger canvas) -->
+  <ellipse cx="64" cy="56" rx="44" ry="32" fill="url(#neb)" opacity="0.75" />
+
+  <!-- bright letter mark (enlarged for higher-resolution raster) -->
+  <g transform="translate(0,0)">
+    <circle cx="64" cy="64" r="36" fill="url(#lg)" />
+    <text x="64" y="74" font-family="Helvetica, Arial, sans-serif" font-weight="800" font-size="44" fill="#0b1220" text-anchor="middle">B</text>
+  </g>
+
+  <!-- tiny stars for sparkle (scaled positions) -->
+  <g fill="#ffffff" opacity="0.95">
+    <circle cx="16" cy="20" r="1.6" />
+    <circle cx="112" cy="24" r="1.4" />
+    <circle cx="104" cy="100" r="1.2" />
+  </g>
+</svg>
