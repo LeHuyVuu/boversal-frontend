@@ -31,9 +31,15 @@ export default function RootLayout({
     }
   }, []);
 
+  const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Boversal';
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://boversal.id.vn';
+  const OG_IMAGE = `${APP_URL}/og-image.png`;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+
+        {/* ===================== THEME SCRIPT ===================== */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -51,10 +57,25 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* ===================== OPEN GRAPH (ZALO/FACEBOOK) ===================== */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={`${APP_NAME} — Quản lý công việc & cộng tác thông minh`} />
+        <meta property="og:description" content="Tăng hiệu suất làm việc với Boversal – nền tảng quản lý dự án, nhắc việc và cộng tác thời gian thực." />
+        <meta property="og:url" content={APP_URL} />
+        <meta property="og:image" content={OG_IMAGE} />
+
+        {/* ===================== TWITTER CARD ===================== */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${APP_NAME} — Task management & Collaboration`} />
+        <meta name="twitter:description" content="Nền tảng quản lý công việc hiện đại, dễ dùng và mạnh mẽ." />
+        <meta name="twitter:image" content={OG_IMAGE} />
+
+        {/* ===================== FAVICON ===================== */}
+        <link rel="icon" href="/favicon.ico" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
