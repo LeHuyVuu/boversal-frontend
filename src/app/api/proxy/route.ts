@@ -20,6 +20,9 @@ export async function GET(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
+    // Log target for server-side troubleshooting (won't be returned to clients)
+    console.debug('[Proxy GET] targetUrl:', targetUrl);
+
     const response = await fetch(targetUrl, {
       method: 'GET',
       headers,
@@ -48,7 +51,7 @@ export async function GET(request: NextRequest) {
     
     return nextResponse;
   } catch (error) {
-    console.error('[Proxy GET Error]', error);
+    console.error('[Proxy GET Error]', error, (error as any)?.stack);
     return NextResponse.json(
       { 
         success: false, 
@@ -82,6 +85,8 @@ export async function POST(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
+    console.debug('[Proxy POST] targetUrl:', targetUrl, 'body:', requestData ? '[present]' : '[empty]');
+
     const response = await fetch(targetUrl, {
       method: 'POST',
       headers,
@@ -111,7 +116,7 @@ export async function POST(request: NextRequest) {
     
     return nextResponse;
   } catch (error) {
-    console.error('[Proxy POST Error]', error);
+    console.error('[Proxy POST Error]', error, (error as any)?.stack);
     return NextResponse.json(
       { 
         success: false, 
@@ -145,6 +150,8 @@ export async function PUT(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
+    console.debug('[Proxy PUT] targetUrl:', targetUrl, 'body:', requestData ? '[present]' : '[empty]');
+
     const response = await fetch(targetUrl, {
       method: 'PUT',
       headers,
@@ -174,7 +181,7 @@ export async function PUT(request: NextRequest) {
     
     return nextResponse;
   } catch (error) {
-    console.error('[Proxy PUT Error]', error);
+    console.error('[Proxy PUT Error]', error, (error as any)?.stack);
     return NextResponse.json(
       { 
         success: false, 
@@ -207,6 +214,8 @@ export async function DELETE(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
+    console.debug('[Proxy DELETE] targetUrl:', targetUrl);
+
     const response = await fetch(targetUrl, {
       method: 'DELETE',
       headers,
@@ -235,7 +244,7 @@ export async function DELETE(request: NextRequest) {
     
     return nextResponse;
   } catch (error) {
-    console.error('[Proxy DELETE Error]', error);
+    console.error('[Proxy DELETE Error]', error, (error as any)?.stack);
     return NextResponse.json(
       { 
         success: false, 
@@ -269,6 +278,8 @@ export async function PATCH(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
+    console.debug('[Proxy PATCH] targetUrl:', targetUrl, 'body:', requestData ? '[present]' : '[empty]');
+
     const response = await fetch(targetUrl, {
       method: 'PATCH',
       headers,
@@ -298,7 +309,7 @@ export async function PATCH(request: NextRequest) {
     
     return nextResponse;
   } catch (error) {
-    console.error('[Proxy PATCH Error]', error);
+    console.error('[Proxy PATCH Error]', error, (error as any)?.stack);
     return NextResponse.json(
       { 
         success: false, 
