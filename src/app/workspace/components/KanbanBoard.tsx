@@ -273,7 +273,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
       }
 
       await taskService.patchTask(taskId, payload);
-      (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✅ Task moved successfully!', life: 3000 });
+      // (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✅ Task moved successfully!', life: 3000 });
     } catch (error) {
       // Revert on error
       setTasks(prevTasks);

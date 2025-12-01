@@ -43,7 +43,7 @@ export const TopBar = React.memo<TopBarProps>(({ onMobileMenuToggle }) => {
         </button>
         {/* Search */}
         <div className="flex-1 max-w-md">
-          <div className="relative group">
+          {/* <div className="relative group">
             <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${
               theme === 'dark' ? 'text-cyan-400 group-focus-within:text-cyan-300' : 'text-slate-400 group-focus-within:text-sky-500'
             }`} />
@@ -56,7 +56,7 @@ export const TopBar = React.memo<TopBarProps>(({ onMobileMenuToggle }) => {
                   : 'bg-white border border-sky-200 text-slate-700 placeholder-slate-400 focus:border-sky-400 focus:bg-white focus:shadow-lg'
               } focus:outline-none`}
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-4">
