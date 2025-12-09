@@ -127,11 +127,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onEdit }) => 
       </h3>
 
       {task.description && (
-        <p className={`text-xs mb-3 line-clamp-3 ${
+        <ul className={`text-xs mb-3 space-y-1 list-disc list-inside ${
           theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
         }`}>
-          {task.description}
-        </p>
+          {task.description.split('\n').filter(line => line.trim()).map((line, index) => (
+            <li key={index} className="leading-relaxed">{line.trim()}</li>
+          ))}
+        </ul>
       )}
 
       <div className={`flex items-center justify-between text-xs ${
