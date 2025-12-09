@@ -45,7 +45,7 @@ const getStatusColor = (statusId: number, theme: string) => {
       5: 'bg-red-100 text-red-700 border border-red-300',
     }
   };
-  return theme === 'dark' 
+  return theme === 'dark'
     ? (colors.dark[statusId as keyof typeof colors.dark] || colors.dark[6])
     : (colors.light[statusId as keyof typeof colors.light] || colors.light[6]);
 };
@@ -99,7 +99,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<'comments' | 'attachments'>('comments');
   const [commentText, setCommentText] = useState('');
-  
+
   // Mock data
   const [comments, setComments] = useState<Comment[]>([
     {
@@ -157,7 +157,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
 
   const handleSendComment = () => {
     if (!commentText.trim()) return;
-    
+
     const newComment: Comment = {
       id: comments.length + 1,
       userId: 2,
@@ -165,7 +165,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
       content: commentText,
       createdAt: new Date().toISOString(),
     };
-    
+
     setComments([...comments, newComment]);
     setCommentText('');
   };
@@ -176,84 +176,74 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
     if (type.includes('image')) return '🖼️';
     return '📎';
   };
-  
+
   return (
     <>
-      <div 
+      <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-in fade-in duration-200"
         onClick={onClose}
       />
-      
+
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div 
-          className={`pointer-events-auto w-full max-w-7xl max-h-[92vh] overflow-hidden rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex ${
-            theme === 'dark'
+        <div
+          className={`pointer-events-auto w-full max-w-7xl max-h-[92vh] overflow-hidden rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex ${theme === 'dark'
               ? 'bg-slate-900'
               : 'bg-white'
-          }`}
+            }`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Main Content - Left Side */}
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Header with close button */}
-            <div className={`px-8 py-5 flex items-center justify-between border-b ${
-              theme === 'dark' 
-                ? 'border-slate-800' 
+            <div className={`px-8 py-5 flex items-center justify-between border-b ${theme === 'dark'
+                ? 'border-slate-800'
                 : 'border-slate-200'
-            }`}>
-              <h2 className={`text-base font-semibold ${
-                theme === 'dark' ? 'text-white' : 'text-slate-900'
               }`}>
+              <h2 className={`text-base font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>
                 Task Detail
               </h2>
               <button
                 onClick={onClose}
-                className={`p-2 rounded-lg transition-all ${
-                  theme === 'dark'
+                className={`p-2 rounded-lg transition-all ${theme === 'dark'
                     ? 'hover:bg-slate-800 text-slate-400 hover:text-white'
                     : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Content */}
-            <div className={`flex-1 overflow-y-auto px-8 py-6 ${
-              theme === 'dark'
+            <div className={`flex-1 overflow-y-auto px-8 py-6 ${theme === 'dark'
                 ? 'bg-slate-900'
                 : 'bg-slate-50'
-            }`}>
-              {/* Title */}
-              <h1 className={`text-3xl font-bold mb-6 ${
-                theme === 'dark' ? 'text-white' : 'text-slate-900'
               }`}>
+              {/* Title */}
+              <h1 className={`text-3xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>
                 {task.title}
               </h1>
 
               {/* Status Row */}
-              <div className={`grid grid-cols-4 gap-6 mb-8 pb-6 border-b ${
-                theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
-              }`}>
+              <div className={`grid grid-cols-4 gap-6 mb-8 pb-6 border-b ${theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+                }`}>
                 <div>
-                  <label className={`text-xs font-medium mb-2 block ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
+                  <label className={`text-xs font-medium mb-2 block ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                    }`}>
                     Status
                   </label>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${
-                    theme === 'dark'
+                  <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${theme === 'dark'
                       ? 'bg-yellow-500/20 text-yellow-300'
                       : 'bg-yellow-100 text-yellow-700'
-                  }`}>
+                    }`}>
                     {task.statusName || 'In Progress'}
                   </span>
                 </div>
 
                 <div>
-                  <label className={`text-xs font-medium mb-2 block ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
+                  <label className={`text-xs font-medium mb-2 block ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                    }`}>
                     Assigned to
                   </label>
                   <div className="flex items-center gap-2">
@@ -266,12 +256,14 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
                             className="w-7 h-7 rounded-full ring-2 ring-white"
                           />
                         ) : (
-                          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white ${
-                            theme === 'dark'
+                          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white ${theme === 'dark'
                               ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white'
                               : 'bg-gradient-to-br from-sky-400 to-blue-500 text-white'
-                          }`}>
-                            {assignee.fullName.charAt(0).toUpperCase()}
+                            }`}>
+                            {assignee.fullName
+                              ? assignee.fullName.charAt(0).toUpperCase()
+                              : "-"
+                            }
                           </div>
                         )}
                       </div>
@@ -280,27 +272,23 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
                 </div>
 
                 <div>
-                  <label className={`text-xs font-medium mb-2 block ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
+                  <label className={`text-xs font-medium mb-2 block ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                    }`}>
                     Start date
                   </label>
-                  <p className={`text-sm font-medium ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
+                  <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-slate-900'
+                    }`}>
                     {formatDate(task.createdAt)}
                   </p>
                 </div>
 
                 <div>
-                  <label className={`text-xs font-medium mb-2 block ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
+                  <label className={`text-xs font-medium mb-2 block ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                    }`}>
                     Due date
                   </label>
-                  <p className={`text-sm font-medium ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
+                  <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-slate-900'
+                    }`}>
                     {formatDate(task.dueDate)}
                   </p>
                 </div>
@@ -308,14 +296,12 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
 
               {/* Priority */}
               <div className="mb-8">
-                <label className={`text-xs font-medium mb-2 block ${
-                  theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-                }`}>
+                <label className={`text-xs font-medium mb-2 block ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
                   Priority
                 </label>
-                <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${
-                  getPriorityColor(task.priority, theme)
-                }`}>
+                <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${getPriorityColor(task.priority, theme)
+                  }`}>
                   {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                 </span>
               </div>
@@ -323,14 +309,12 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
               {/* Description Section */}
               {task.description && (
                 <div className="mb-6">
-                  <h3 className={`text-base font-semibold mb-4 ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
+                  <h3 className={`text-base font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-slate-900'
+                    }`}>
                     Description
                   </h3>
-                  <ul className={`space-y-2 list-disc list-inside ${
-                    theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
-                  }`}>
+                  <ul className={`space-y-2 list-disc list-inside ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+                    }`}>
                     {task.description.split('\n').filter(line => line.trim()).map((line, index) => (
                       <li key={index} className="text-sm leading-relaxed ml-2">{line.trim()}</li>
                     ))}
@@ -339,35 +323,32 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
               )}
 
               {/* Tabs for Attachment and Comments */}
-              <div className={`border-b ${
-                theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
-              }`}>
+              <div className={`border-b ${theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+                }`}>
                 <div className="flex gap-6">
                   <button
                     onClick={() => setActiveTab('attachments')}
-                    className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${
-                      activeTab === 'attachments'
+                    className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'attachments'
                         ? theme === 'dark'
                           ? 'border-cyan-400 text-cyan-400'
                           : 'border-blue-600 text-blue-600'
                         : theme === 'dark'
-                        ? 'border-transparent text-slate-400 hover:text-slate-300'
-                        : 'border-transparent text-slate-500 hover:text-slate-900'
-                    }`}
+                          ? 'border-transparent text-slate-400 hover:text-slate-300'
+                          : 'border-transparent text-slate-500 hover:text-slate-900'
+                      }`}
                   >
                     Attachment
                   </button>
                   <button
                     onClick={() => setActiveTab('comments')}
-                    className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${
-                      activeTab === 'comments'
+                    className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'comments'
                         ? theme === 'dark'
                           ? 'border-cyan-400 text-cyan-400'
                           : 'border-blue-600 text-blue-600'
                         : theme === 'dark'
-                        ? 'border-transparent text-slate-400 hover:text-slate-300'
-                        : 'border-transparent text-slate-500 hover:text-slate-900'
-                    }`}
+                          ? 'border-transparent text-slate-400 hover:text-slate-300'
+                          : 'border-transparent text-slate-500 hover:text-slate-900'
+                      }`}
                   >
                     Comments
                   </button>
@@ -387,50 +368,43 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
           </div>
 
           {/* Right Sidebar - Project Status & Activities */}
-          <div className={`w-[380px] border-l flex flex-col ${
-            theme === 'dark' 
-              ? 'border-slate-800 bg-slate-900' 
+          <div className={`w-[380px] border-l flex flex-col ${theme === 'dark'
+              ? 'border-slate-800 bg-slate-900'
               : 'border-slate-200 bg-white'
-          }`}>
+            }`}>
             {/* Activities */}
             <div className="flex-1 overflow-y-auto p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className={`text-sm font-bold ${
-                  theme === 'dark' ? 'text-white' : 'text-slate-900'
-                }`}>
+                <h3 className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'
+                  }`}>
                   Activities
                 </h3>
               </div>
 
               {/* Empty State */}
-              <div className={`text-center py-12 ${
-                theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
-              }`}>
+              <div className={`text-center py-12 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
+                }`}>
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p className="text-sm">No activities yet</p>
               </div>
             </div>
 
             {/* Created By */}
-            <div className={`p-6 border-t ${
-              theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
-            }`}>
-              <p className={`text-xs mb-2 ${
-                theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+            <div className={`p-6 border-t ${theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
               }`}>
+              <p className={`text-xs mb-2 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                }`}>
                 Created by
               </p>
               <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                  theme === 'dark'
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${theme === 'dark'
                     ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white'
                     : 'bg-gradient-to-br from-sky-400 to-blue-500 text-white'
-                }`}>
+                  }`}>
                   {task.createdByName?.charAt(0).toUpperCase() || 'U'}
                 </div>
-                <span className={`text-sm font-semibold ${
-                  theme === 'dark' ? 'text-white' : 'text-slate-900'
-                }`}>
+                <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'
+                  }`}>
                   {task.createdByName || 'Unknown'}
                 </span>
               </div>
