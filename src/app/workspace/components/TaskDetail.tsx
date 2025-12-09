@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { X, Calendar, User, Briefcase, Tag, MessageSquare, Paperclip, Send, MoreVertical, Edit, Trash, Download } from 'lucide-react';
+import { X, Calendar, User, Briefcase, Tag, MessageSquare, Paperclip, Send, Download, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Task } from '@/services/taskService';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -28,24 +28,46 @@ interface Attachment {
   url: string;
 }
 
-const getStatusColor = (statusId: number) => {
+const getStatusColor = (statusId: number, theme: string) => {
   const colors = {
-    6: 'bg-slate-500 text-white',
-    7: 'bg-cyan-500 text-white',
-    9: 'bg-amber-500 text-white',
-    4: 'bg-emerald-500 text-white',
+    dark: {
+      6: 'bg-slate-500/20 text-slate-300 border border-slate-500/40',
+      7: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40',
+      9: 'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+      4: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+      5: 'bg-red-500/20 text-red-300 border border-red-500/40',
+    },
+    light: {
+      6: 'bg-slate-100 text-slate-700 border border-slate-300',
+      7: 'bg-cyan-100 text-cyan-700 border border-cyan-300',
+      9: 'bg-amber-100 text-amber-700 border border-amber-300',
+      4: 'bg-emerald-100 text-emerald-700 border border-emerald-300',
+      5: 'bg-red-100 text-red-700 border border-red-300',
+    }
   };
-  return colors[statusId as keyof typeof colors] || 'bg-slate-500 text-white';
+  return theme === 'dark' 
+    ? (colors.dark[statusId as keyof typeof colors.dark] || colors.dark[6])
+    : (colors.light[statusId as keyof typeof colors.light] || colors.light[6]);
 };
 
-const getPriorityColor = (priority: string) => {
+const getPriorityColor = (priority: string, theme: string) => {
   const colors = {
-    'low': 'bg-green-500 text-white',
-    'medium': 'bg-blue-500 text-white',
-    'high': 'bg-orange-500 text-white',
-    'critical': 'bg-red-500 text-white',
+    dark: {
+      'low': 'bg-green-500/20 text-green-300 border border-green-500/40',
+      'medium': 'bg-blue-500/20 text-blue-300 border border-blue-500/40',
+      'high': 'bg-orange-500/20 text-orange-300 border border-orange-500/40',
+      'critical': 'bg-red-500/20 text-red-300 border border-red-500/40',
+    },
+    light: {
+      'low': 'bg-green-100 text-green-700 border border-green-300',
+      'medium': 'bg-blue-100 text-blue-700 border border-blue-300',
+      'high': 'bg-orange-100 text-orange-700 border border-orange-300',
+      'critical': 'bg-red-100 text-red-700 border border-red-300',
+    }
   };
-  return colors[priority as keyof typeof colors] || 'bg-blue-500 text-white';
+  return theme === 'dark'
+    ? (colors.dark[priority as keyof typeof colors.dark] || colors.dark.medium)
+    : (colors.light[priority as keyof typeof colors.light] || colors.light.medium);
 };
 
 const formatDate = (dateString: string | null | undefined): string => {
@@ -158,13 +180,13 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-in fade-in duration-200"
         onClick={onClose}
       />
       
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div 
-          className={`pointer-events-auto w-full max-w-5xl h-[85vh] overflow-hidden rounded-xl shadow-2xl animate-in zoom-in-95 duration-300 flex ${
+          className={`pointer-events-auto w-full max-w-7xl max-h-[92vh] overflow-hidden rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex ${
             theme === 'dark'
               ? 'bg-slate-900'
               : 'bg-white'
@@ -173,156 +195,78 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
         >
           {/* Main Content - Left Side */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Header */}
-            <div className={`px-5 py-3 border-b ${
-              theme === 'dark' ? 'border-slate-700' : 'border-slate-200'
+            {/* Header with close button */}
+            <div className={`px-8 py-5 flex items-center justify-between border-b ${
+              theme === 'dark' 
+                ? 'border-slate-800' 
+                : 'border-slate-200'
             }`}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      theme === 'dark'
-                        ? 'bg-slate-800 text-cyan-400'
-                        : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      TASK-{task.id}
-                    </span>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getStatusColor(task.statusId)}`}>
-                      {task.statusName || 'Unknown'}
-                    </span>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getPriorityColor(task.priority)}`}>
-                      {task.priority.toUpperCase()}
-                    </span>
-                  </div>
-                  <h1 className={`text-xl font-bold leading-tight truncate ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {task.title}
-                  </h1>
-                </div>
-                <button
-                  onClick={onClose}
-                  className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
-                    theme === 'dark'
-                      ? 'hover:bg-slate-800 text-slate-400 hover:text-white'
-                      : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
-                  }`}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <h2 className={`text-base font-semibold ${
+                theme === 'dark' ? 'text-white' : 'text-slate-900'
+              }`}>
+                Task Detail
+              </h2>
+              <button
+                onClick={onClose}
+                className={`p-2 rounded-lg transition-all ${
+                  theme === 'dark'
+                    ? 'hover:bg-slate-800 text-slate-400 hover:text-white'
+                    : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Content */}
-            <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${
+            <div className={`flex-1 overflow-y-auto px-8 py-6 ${
               theme === 'dark'
-                ? 'bg-slate-900/50'
-                : 'bg-slate-50/50'
+                ? 'bg-slate-900'
+                : 'bg-slate-50'
             }`}>
-              {/* Description */}
-              {task.description && (
+              {/* Title */}
+              <h1 className={`text-3xl font-bold mb-6 ${
+                theme === 'dark' ? 'text-white' : 'text-slate-900'
+              }`}>
+                {task.title}
+              </h1>
+
+              {/* Status Row */}
+              <div className={`grid grid-cols-4 gap-6 mb-8 pb-6 border-b ${
+                theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+              }`}>
                 <div>
-                  <h3 className={`text-xs font-semibold mb-2 uppercase tracking-wide ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  <label className={`text-xs font-medium mb-2 block ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
                   }`}>
-                    Description
-                  </h3>
-                  <p className={`text-sm leading-relaxed ${
-                    theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+                    Status
+                  </label>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${
+                    theme === 'dark'
+                      ? 'bg-yellow-500/20 text-yellow-300'
+                      : 'bg-yellow-100 text-yellow-700'
                   }`}>
-                    {task.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className={`p-3 rounded-lg ${
-                  theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'
-                }`}>
-                  <div className={`text-xs font-semibold mb-1 flex items-center gap-1 ${
-                    theme === 'dark' ? 'text-slate-500' : 'text-slate-500'
-                  }`}>
-                    <Calendar className="w-3 h-3" />
-                    Due Date
-                  </div>
-                  <div className={`text-sm font-medium ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {formatDate(task.dueDate)}
-                  </div>
+                    {task.statusName || 'In Progress'}
+                  </span>
                 </div>
 
-                <div className={`p-3 rounded-lg ${
-                  theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'
-                }`}>
-                  <div className={`text-xs font-semibold mb-1 flex items-center gap-1 ${
-                    theme === 'dark' ? 'text-slate-500' : 'text-slate-500'
-                  }`}>
-                    <Briefcase className="w-3 h-3" />
-                    Project
-                  </div>
-                  <div className={`text-sm font-medium ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    Project #{task.projectId}
-                  </div>
-                </div>
-
-                <div className={`p-3 rounded-lg ${
-                  theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'
-                }`}>
-                  <div className={`text-xs font-semibold mb-1 flex items-center gap-1 ${
-                    theme === 'dark' ? 'text-slate-500' : 'text-slate-500'
-                  }`}>
-                    <User className="w-3 h-3" />
-                    Created By
-                  </div>
-                  <div className={`text-sm font-medium truncate ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {task.createdByName || 'Unknown'}
-                  </div>
-                </div>
-
-                <div className={`p-3 rounded-lg ${
-                  theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'
-                }`}>
-                  <div className={`text-xs font-semibold mb-1 flex items-center gap-1 ${
-                    theme === 'dark' ? 'text-slate-500' : 'text-slate-500'
-                  }`}>
-                    <Tag className="w-3 h-3" />
-                    Order
-                  </div>
-                  <div className={`text-sm font-medium ${
-                    theme === 'dark' ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {task.orderIndex}
-                  </div>
-                </div>
-              </div>
-
-              {/* Assignees */}
-              {task.assignees && task.assignees.length > 0 && (
                 <div>
-                  <h3 className={`text-xs font-semibold mb-2 uppercase tracking-wide ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  <label className={`text-xs font-medium mb-2 block ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
                   }`}>
-                    Assignees
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {task.assignees.map((assignee, idx) => (
-                      <div key={idx} className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
-                        theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'
-                      }`}>
+                    Assigned to
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {task.assignees && task.assignees.slice(0, 3).map((assignee, idx) => (
+                      <div key={idx} className="relative">
                         {assignee.avatarUrl ? (
                           <img
                             src={assignee.avatarUrl}
                             alt={assignee.fullName}
-                            className="w-8 h-8 rounded-full"
+                            className="w-7 h-7 rounded-full ring-2 ring-white"
                           />
                         ) : (
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white ${
                             theme === 'dark'
                               ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white'
                               : 'bg-gradient-to-br from-sky-400 to-blue-500 text-white'
@@ -330,216 +274,167 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
                             {assignee.fullName.charAt(0).toUpperCase()}
                           </div>
                         )}
-                        <div className="min-w-0">
-                          <div className={`text-sm font-semibold truncate ${
-                            theme === 'dark' ? 'text-white' : 'text-slate-900'
-                          }`}>
-                            {assignee.fullName}
-                          </div>
-                          <div className={`text-xs truncate ${
-                            theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-                          }`}>
-                            {assignee.email}
-                          </div>
-                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
+
+                <div>
+                  <label className={`text-xs font-medium mb-2 block ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    Start date
+                  </label>
+                  <p className={`text-sm font-medium ${
+                    theme === 'dark' ? 'text-white' : 'text-slate-900'
+                  }`}>
+                    {formatDate(task.createdAt)}
+                  </p>
+                </div>
+
+                <div>
+                  <label className={`text-xs font-medium mb-2 block ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    Due date
+                  </label>
+                  <p className={`text-sm font-medium ${
+                    theme === 'dark' ? 'text-white' : 'text-slate-900'
+                  }`}>
+                    {formatDate(task.dueDate)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Priority */}
+              <div className="mb-8">
+                <label className={`text-xs font-medium mb-2 block ${
+                  theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                }`}>
+                  Priority
+                </label>
+                <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${
+                  getPriorityColor(task.priority, theme)
+                }`}>
+                  {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                </span>
+              </div>
+
+              {/* Description Section */}
+              {task.description && (
+                <div className="mb-6">
+                  <h3 className={`text-base font-semibold mb-4 ${
+                    theme === 'dark' ? 'text-white' : 'text-slate-900'
+                  }`}>
+                    Description
+                  </h3>
+                  <ul className={`space-y-2 list-disc list-inside ${
+                    theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+                  }`}>
+                    {task.description.split('\n').filter(line => line.trim()).map((line, index) => (
+                      <li key={index} className="text-sm leading-relaxed ml-2">{line.trim()}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
+
+              {/* Tabs for Attachment and Comments */}
+              <div className={`border-b ${
+                theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+              }`}>
+                <div className="flex gap-6">
+                  <button
+                    onClick={() => setActiveTab('attachments')}
+                    className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${
+                      activeTab === 'attachments'
+                        ? theme === 'dark'
+                          ? 'border-cyan-400 text-cyan-400'
+                          : 'border-blue-600 text-blue-600'
+                        : theme === 'dark'
+                        ? 'border-transparent text-slate-400 hover:text-slate-300'
+                        : 'border-transparent text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    Attachment
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('comments')}
+                    className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${
+                      activeTab === 'comments'
+                        ? theme === 'dark'
+                          ? 'border-cyan-400 text-cyan-400'
+                          : 'border-blue-600 text-blue-600'
+                        : theme === 'dark'
+                        ? 'border-transparent text-slate-400 hover:text-slate-300'
+                        : 'border-transparent text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    Comments
+                  </button>
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              <div className="mt-4">
+                {activeTab === 'attachments' && (
+                  <div className="text-sm text-slate-400">No attachments</div>
+                )}
+                {activeTab === 'comments' && (
+                  <div className="text-sm text-slate-400">No comments yet</div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Right Sidebar */}
-          <div className={`w-80 border-l flex flex-col ${
-            theme === 'dark' ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'
+          {/* Right Sidebar - Project Status & Activities */}
+          <div className={`w-[380px] border-l flex flex-col ${
+            theme === 'dark' 
+              ? 'border-slate-800 bg-slate-900' 
+              : 'border-slate-200 bg-white'
           }`}>
-            {/* Tabs */}
-            <div className={`flex border-b ${
-              theme === 'dark' ? 'border-slate-700' : 'border-slate-200'
-            }`}>
-              <button
-                onClick={() => setActiveTab('comments')}
-                className={`flex-1 px-3 py-2.5 text-xs font-semibold transition-colors relative ${
-                  activeTab === 'comments'
-                    ? theme === 'dark'
-                      ? 'text-cyan-400'
-                      : 'text-blue-600'
-                    : theme === 'dark'
-                    ? 'text-slate-400 hover:text-slate-300'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5 inline mr-1" />
-                Comments ({comments.length})
-                {activeTab === 'comments' && (
-                  <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${
-                    theme === 'dark' ? 'bg-cyan-400' : 'bg-blue-600'
-                  }`} />
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('attachments')}
-                className={`flex-1 px-3 py-2.5 text-xs font-semibold transition-colors relative ${
-                  activeTab === 'attachments'
-                    ? theme === 'dark'
-                      ? 'text-cyan-400'
-                      : 'text-blue-600'
-                    : theme === 'dark'
-                    ? 'text-slate-400 hover:text-slate-300'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Paperclip className="w-3.5 h-3.5 inline mr-1" />
-                Files ({attachments.length})
-                {activeTab === 'attachments' && (
-                  <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${
-                    theme === 'dark' ? 'bg-cyan-400' : 'bg-blue-600'
-                  }`} />
-                )}
-              </button>
+            {/* Activities */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`text-sm font-bold ${
+                  theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>
+                  Activities
+                </h3>
+              </div>
+
+              {/* Empty State */}
+              <div className={`text-center py-12 ${
+                theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
+              }`}>
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p className="text-sm">No activities yet</p>
+              </div>
             </div>
 
-            {/* Comments Tab */}
-            {activeTab === 'comments' && (
-              <>
-                <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-2">
-                      {comment.userAvatar ? (
-                        <img
-                          src={comment.userAvatar}
-                          alt={comment.userName}
-                          className="w-7 h-7 rounded-full flex-shrink-0"
-                        />
-                      ) : (
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                          theme === 'dark'
-                            ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white'
-                            : 'bg-gradient-to-br from-sky-400 to-blue-500 text-white'
-                        }`}>
-                          {comment.userName.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-2 mb-0.5">
-                          <span className={`text-xs font-semibold truncate ${
-                            theme === 'dark' ? 'text-white' : 'text-slate-900'
-                          }`}>
-                            {comment.userName}
-                          </span>
-                          <span className={`text-xs flex-shrink-0 ${
-                            theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
-                          }`}>
-                            {formatTime(comment.createdAt)}
-                          </span>
-                        </div>
-                        <p className={`text-xs leading-relaxed ${
-                          theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
-                        }`}>
-                          {comment.content}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Comment Input */}
-                <div className={`p-3 border-t ${
-                  theme === 'dark' ? 'border-slate-700' : 'border-slate-200'
-                }`}>
-                  <div className={`flex gap-2 p-2 rounded-lg border ${
-                    theme === 'dark'
-                      ? 'bg-slate-800 border-slate-700'
-                      : 'bg-slate-50 border-slate-200'
-                  }`}>
-                    <input
-                      type="text"
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
-                      placeholder="Write a comment..."
-                      className={`flex-1 bg-transparent outline-none text-xs ${
-                        theme === 'dark'
-                          ? 'text-white placeholder-slate-500'
-                          : 'text-slate-900 placeholder-slate-400'
-                      }`}
-                    />
-                    <button
-                      onClick={handleSendComment}
-                      disabled={!commentText.trim()}
-                      className={`p-1.5 rounded-md transition-colors ${
-                        commentText.trim()
-                          ? theme === 'dark'
-                            ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                          : theme === 'dark'
-                          ? 'bg-slate-700 text-slate-500'
-                          : 'bg-slate-200 text-slate-400'
-                      }`}
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Attachments Tab */}
-            {activeTab === 'attachments' && (
-              <div className="flex-1 overflow-y-auto p-3 space-y-2">
-                {attachments.map((file) => (
-                  <div
-                    key={file.id}
-                    className={`p-3 rounded-lg border transition-colors ${
-                      theme === 'dark'
-                        ? 'bg-slate-800/50 border-slate-700 hover:bg-slate-800'
-                        : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className="text-xl">{getFileIcon(file.type)}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className={`text-xs font-semibold truncate ${
-                          theme === 'dark' ? 'text-white' : 'text-slate-900'
-                        }`}>
-                          {file.name}
-                        </div>
-                        <div className={`text-xs mt-0.5 truncate ${
-                          theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
-                        }`}>
-                          {file.size} • {file.uploadedBy}
-                        </div>
-                        <div className={`text-xs ${
-                          theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
-                        }`}>
-                          {formatTime(file.uploadedAt)}
-                        </div>
-                      </div>
-                      <button
-                        className={`p-1.5 rounded-md transition-colors flex-shrink-0 ${
-                          theme === 'dark'
-                            ? 'hover:bg-slate-700 text-slate-400 hover:text-white'
-                            : 'hover:bg-slate-200 text-slate-500 hover:text-slate-900'
-                        }`}
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                
-                {/* Upload Button */}
-                <button className={`w-full p-3 rounded-lg border-2 border-dashed transition-colors ${
+            {/* Created By */}
+            <div className={`p-6 border-t ${
+              theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+            }`}>
+              <p className={`text-xs mb-2 ${
+                theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+              }`}>
+                Created by
+              </p>
+              <div className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
                   theme === 'dark'
-                    ? 'border-slate-700 hover:border-cyan-500 text-slate-400 hover:text-cyan-400'
-                    : 'border-slate-300 hover:border-blue-500 text-slate-500 hover:text-blue-600'
+                    ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white'
+                    : 'bg-gradient-to-br from-sky-400 to-blue-500 text-white'
                 }`}>
-                  <Paperclip className="w-4 h-4 mx-auto mb-1" />
-                  <div className="text-xs font-medium">Upload file</div>
-                </button>
+                  {task.createdByName?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <span className={`text-sm font-semibold ${
+                  theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>
+                  {task.createdByName || 'Unknown'}
+                </span>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
