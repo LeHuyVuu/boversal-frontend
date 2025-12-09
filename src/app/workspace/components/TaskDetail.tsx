@@ -1,12 +1,16 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { X, Calendar, User, Briefcase, Tag, MessageSquare, Paperclip, Send, Download, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
-import { Task } from '@/services/taskService';
+import React, { useEffect, useState, useRef } from 'react';
+import { X, Calendar, User, Briefcase, Tag, MessageSquare, Paperclip, Send, Download, Clock, CheckCircle2, AlertCircle, Trash2 } from 'lucide-react';
+import { Task, taskService } from '@/services/taskService';
 import { useTheme } from '@/contexts/ThemeContext';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { Toast } from 'primereact/toast';
+import 'primereact/resources/themes/lara-light-cyan/theme.css';
 
 interface TaskDetailProps {
   task: Task;
   onClose: () => void;
+  onTaskDeleted?: () => void;
 }
 
 interface Comment {
@@ -95,10 +99,12 @@ const formatTime = (dateString: string): string => {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
+export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose, onTaskDeleted }) => {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<'comments' | 'attachments'>('comments');
   const [commentText, setCommentText] = useState('');
+  const toast = useRef<Toast>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Mock data
   const [comments, setComments] = useState<Comment[]>([
@@ -170,6 +176,42 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
     setCommentText('');
   };
 
+  const handleDeleteTask = () => {
+    confirmDialog({
+      message: 'Are you sure you want to delete this task? This action cannot be undone.',
+      header: 'Delete Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      defaultFocus: 'reject',
+      acceptClassName: 'p-button-danger',
+      accept: async () => {
+        setIsDeleting(true);
+        try {
+          await taskService.deleteTask(task.id);
+          toast.current?.show({
+            severity: 'success',
+            summary: 'Deleted',
+            detail: 'Task deleted successfully',
+            life: 3000,
+          });
+          setTimeout(() => {
+            onClose();
+            onTaskDeleted?.();
+          }, 500);
+        } catch (error) {
+          console.error('Error deleting task:', error);
+          toast.current?.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to delete task',
+            life: 3000,
+          });
+        } finally {
+          setIsDeleting(false);
+        }
+      },
+    });
+  };
+
   const getFileIcon = (type: string) => {
     if (type === 'pdf') return '📄';
     if (type === 'figma') return '🎨';
@@ -179,6 +221,8 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
 
   return (
     <>
+      <Toast ref={toast} />
+      <ConfirmDialog />
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-in fade-in duration-200"
         onClick={onClose}
@@ -203,15 +247,29 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose }) => {
                 }`}>
                 Task Detail
               </h2>
-              <button
-                onClick={onClose}
-                className={`p-2 rounded-lg transition-all ${theme === 'dark'
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleDeleteTask}
+                  disabled={isDeleting}
+                  className={`p-2 rounded-lg transition-all flex items-center gap-2 ${
+                    theme === 'dark'
+                      ? 'hover:bg-red-500/20 text-red-400 hover:text-red-300 disabled:opacity-50'
+                      : 'hover:bg-red-50 text-red-600 hover:text-red-700 disabled:opacity-50'
+                  }`}
+                  title="Delete task"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={onClose}
+                  className={`p-2 rounded-lg transition-all ${theme === 'dark'
                     ? 'hover:bg-slate-800 text-slate-400 hover:text-white'
                     : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
                   }`}
-              >
-                <X className="w-5 h-5" />
-              </button>
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Content */}

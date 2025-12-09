@@ -84,27 +84,27 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
   };
 
   // Fetch tasks
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = projectId
-          ? await taskService.getTasks(1, 100, projectId)
-          : await taskService.getMyTasks(1, 100);
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = projectId
+        ? await taskService.getTasks(1, 100, projectId)
+        : await taskService.getMyTasks(1, 100);
 
-        if (response.success) {
-          setTasks(response.data);
-        } else {
-          setError(response.message || 'Failed to load tasks');
-        }
-      } catch (e: any) {
-        setError(e?.message || 'Failed to load tasks');
-      } finally {
-        setLoading(false);
+      if (response.success) {
+        setTasks(response.data);
+      } else {
+        setError(response.message || 'Failed to load tasks');
       }
-    };
+    } catch (e: any) {
+      setError(e?.message || 'Failed to load tasks');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTasks();
   }, [projectId]);
 
@@ -273,11 +273,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
       }
 
       await taskService.patchTask(taskId, payload);
+      // Toast đã tắt khi drag & drop - không cần thông báo
       // (window as any).toast?.show({ severity: 'success', summary: 'Thành công', detail: '✅ Task moved successfully!', life: 3000 });
     } catch (error) {
       // Revert on error
       setTasks(prevTasks);
-      (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: 'Failed to move task', life: 3000 });
+      // Toast đã tắt khi drag & drop
+      // (window as any).toast?.show({ severity: 'error', summary: 'Lỗi', detail: 'Failed to move task', life: 3000 });
       // Silently fail - already reverted UI
     }
   };
@@ -610,7 +612,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
 
       {/* Task Detail Modal */}
       {selectedTask && (
-        <TaskDetail task={selectedTask} onClose={() => setSelectedTask(null)} />
+        <TaskDetail 
+          task={selectedTask} 
+          onClose={() => setSelectedTask(null)}
+          onTaskDeleted={() => {
+            setSelectedTask(null);
+            fetchTasks();
+          }}
+        />
       )}
 
       {/* Edit Task Modal */}
