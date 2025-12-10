@@ -61,8 +61,13 @@ axios.interceptors.response.use(
     if (error.response?.status === 401) {
       console.warn('⚠️ [Auth] Unauthorized - Token expired or invalid');
       
-      // Only redirect if not already on login page
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+      // Only redirect if not already on login page and not on Meeting endpoint
+      // (Meeting endpoint might not be ready yet)
+      const isMeetingEndpoint = error.config?.url?.includes('/Meeting');
+      
+      if (typeof window !== 'undefined' 
+          && !window.location.pathname.includes('/login')
+          && !isMeetingEndpoint) {
         window.location.href = '/login';
       }
     }

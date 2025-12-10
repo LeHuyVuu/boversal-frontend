@@ -16,6 +16,8 @@ const Meetings: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   // Fetch meetings on mount
   useEffect(() => {
@@ -26,11 +28,14 @@ const Meetings: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('🔄 Loading meetings...');
       const data = await meetingService.getMeetings();
-      setMeetings(data);
+      console.log('✅ Meetings loaded:', data);
+      setMeetings(data || []);
     } catch (err: any) {
-      setError(err?.message || 'Failed to load meetings');
-      console.error('Failed to load meetings:', err);
+      const errorMsg = err?.message || 'Failed to load meetings';
+      setError(errorMsg);
+      console.error('❌ Failed to load meetings:', err);
     } finally {
       setLoading(false);
     }
@@ -122,6 +127,17 @@ const Meetings: React.FC = () => {
   const filteredMeetings = filter === 'all' 
     ? meetings 
     : meetings.filter((m) => getMeetingStatus(m.startTime, m.endTime) === filter);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredMeetings.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentMeetings = filteredMeetings.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   if (loading) {
     return (
@@ -217,8 +233,9 @@ const Meetings: React.FC = () => {
 
         {/* Meeting Grid */}
         {filteredMeetings.length > 0 ? (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMeetings.map((meeting) => {
+            {currentMeetings.map((meeting) => {
               const status = getMeetingStatus(meeting.startTime, meeting.endTime);
               return (
                 <div
@@ -353,6 +370,64 @@ const Meetings: React.FC = () => {
               );
             })}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === 1
+                    ? theme === 'dark'
+                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : theme === 'dark'
+                      ? 'bg-slate-900/60 text-cyan-300 border border-blue-500/20 hover:bg-blue-900/30'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                Previous
+              </button>
+
+              <div className="flex gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === page
+                        ? theme === 'dark'
+                          ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/50'
+                          : 'bg-blue-600 text-white'
+                        : theme === 'dark'
+                          ? 'bg-slate-900/60 text-cyan-300 border border-blue-500/20 hover:bg-blue-900/30'
+                          : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === totalPages
+                    ? theme === 'dark'
+                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : theme === 'dark'
+                      ? 'bg-slate-900/60 text-cyan-300 border border-blue-500/20 hover:bg-blue-900/30'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          )}
+          </>
         ) : (
           <div className={`text-center py-12 ${
             theme === 'dark' ? 'text-cyan-300' : 'text-gray-600'

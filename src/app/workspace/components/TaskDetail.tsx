@@ -10,7 +10,7 @@ import 'primereact/resources/themes/lara-light-cyan/theme.css';
 interface TaskDetailProps {
   task: Task;
   onClose: () => void;
-  onTaskDeleted?: () => void;
+  onTaskDeleted?: (taskId: number) => void;
 }
 
 interface Comment {
@@ -191,12 +191,11 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose, onTaskDel
             severity: 'success',
             summary: 'Deleted',
             detail: 'Task deleted successfully',
-            life: 3000,
+            life: 2000,
           });
-          setTimeout(() => {
-            onClose();
-            onTaskDeleted?.();
-          }, 500);
+          // Đóng modal ngay lập tức và callback với taskId
+          onClose();
+          onTaskDeleted?.(task.id);
         } catch (error) {
           console.error('Error deleting task:', error);
           toast.current?.show({
@@ -205,7 +204,6 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onClose, onTaskDel
             detail: 'Failed to delete task',
             life: 3000,
           });
-        } finally {
           setIsDeleting(false);
         }
       },

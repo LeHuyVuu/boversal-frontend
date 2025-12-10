@@ -615,9 +615,10 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
         <TaskDetail 
           task={selectedTask} 
           onClose={() => setSelectedTask(null)}
-          onTaskDeleted={() => {
+          onTaskDeleted={(deletedTaskId) => {
             setSelectedTask(null);
-            fetchTasks();
+            // Optimistic update: xóa task khỏi state ngay lập tức
+            setTasks(prevTasks => prevTasks.filter(t => t.id !== deletedTaskId));
           }}
         />
       )}

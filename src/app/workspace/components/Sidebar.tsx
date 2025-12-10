@@ -26,7 +26,7 @@ const menuItems = [
   // { icon: AlertCircle, label: 'Issues', key: 'issues' as const },
     { icon: Timer, label: 'Pomodoro', key: 'pomodoro' as const },
   { icon: Calendar, label: 'Calendar', key: 'calendar' as const },
-  // { icon: Video, label: 'Meetings', key: 'meetings' as const },
+  { icon: Video, label: 'Meetings', key: 'meetings' as const },
   // { icon: HardDrive, label: 'Storage', key: 'storage' as const },
   // { icon: FileText, label: 'Documents', key: 'documents' as const },
 ];
