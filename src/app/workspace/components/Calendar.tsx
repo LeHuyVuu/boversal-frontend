@@ -7,7 +7,10 @@ import {
   Calendar as CalendarIcon,
   Clock,
   Users,
-  Target
+  Target,
+  Bell,
+  Type,
+  AlignLeft
 } from 'lucide-react';
 import mockCalendarEvents from '@/mocks/mockCalendarEvents.json';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -16,6 +19,35 @@ export const Calendar: React.FC = () => {
   const { theme } = useTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    time: '',
+    type: 'reminder' as 'meeting' | 'deadline' | 'milestone' | 'review' | 'reminder',
+    description: ''
+  });
+
+  const handleCreateEvent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDate) return;
+    
+    console.log('New event:', {
+      ...formData,
+      date: selectedDate.toISOString().split('T')[0]
+    });
+    
+    // Reset form
+    setFormData({
+      title: '',
+      time: '',
+      type: 'reminder',
+      description: ''
+    });
+  };
+
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+  };
 
   const today = new Date();
   const currentMonth = currentDate.getMonth();
@@ -130,19 +162,11 @@ export const Calendar: React.FC = () => {
               Schedule and track important events and deadlines.
             </p>
           </div>
-          <button className={`px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors ${
-            theme === 'dark'
-              ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/50'
-              : 'bg-sky-400 hover:bg-sky-500 text-white'
-          }`}>
-            <Plus className="w-4 h-4" />
-            <span>New Event</span>
-          </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Calendar */}
-          <div className="lg:col-span-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Calendar - 2 columns */}
+          <div className="lg:col-span-2">
             <div className={`rounded-lg p-6 ${
               theme === 'dark'
                 ? 'bg-slate-900/60 border border-blue-500/20 backdrop-blur-sm'
@@ -220,6 +244,7 @@ export const Calendar: React.FC = () => {
                   return (
                     <div
                       key={index}
+                      onClick={() => handleDateClick(day.fullDate)}
                       className={`min-h-16 sm:min-h-24 p-1 sm:p-2 transition-colors cursor-pointer ${
                         theme === 'dark'
                           ? !day.isCurrentMonth 
@@ -228,7 +253,13 @@ export const Calendar: React.FC = () => {
                           : !day.isCurrentMonth 
                             ? 'bg-slate-50 text-slate-400' 
                             : 'bg-white hover:bg-sky-50'
-                      } ${day.isToday ? theme === 'dark' ? 'ring-2 ring-cyan-400' : 'ring-2 ring-sky-400' : ''}`}
+                      } ${day.isToday ? theme === 'dark' ? 'ring-2 ring-cyan-400' : 'ring-2 ring-sky-400' : ''} ${
+                        selectedDate?.toDateString() === day.fullDate.toDateString()
+                          ? theme === 'dark'
+                            ? 'ring-2 ring-blue-500 bg-blue-900/40'
+                            : 'ring-2 ring-blue-500 bg-blue-50'
+                          : ''
+                      }`}
                     >
                       <div className={`text-xs sm:text-sm font-medium mb-1 ${
                         day.isToday 
@@ -269,61 +300,234 @@ export const Calendar: React.FC = () => {
             </div>
           </div>
 
-          {/* Upcoming Events Sidebar */}
+          {/* Right Sidebar - Event Creator & List */}
           <div className="space-y-6">
+            {/* Event Creator */}
+            <div className={`rounded-lg p-4 border ${
+              theme === 'dark'
+                ? 'bg-slate-900/60 border-blue-500/20 backdrop-blur-sm'
+                : 'bg-white border-slate-200'
+            }`}>
+              <h3 className={`text-base font-semibold mb-3 ${
+                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+              }`}>
+                {selectedDate ? 'Create Event' : 'Select a date'}
+              </h3>
+
+              <form onSubmit={handleCreateEvent} className="space-y-3">
+                {/* Selected Date Display */}
+                {selectedDate && (
+                  <div>
+                    <label className={`block text-xs font-medium mb-1 ${
+                      theme === 'dark' ? 'text-cyan-300' : 'text-gray-700'
+                    }`}>
+                      <div className="flex items-center gap-1.5">
+                        <CalendarIcon className="w-3 h-3" />
+                        <span>Date</span>
+                      </div>
+                    </label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={selectedDate.toLocaleDateString('en-US', { 
+                        weekday: 'short',
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                      className={`w-full px-3 py-1.5 text-sm rounded-lg border ${
+                        theme === 'dark'
+                          ? 'bg-slate-800/50 border-blue-500/20 text-cyan-100'
+                          : 'bg-gray-50 border-gray-300 text-gray-700'
+                      }`}
+                    />
+                  </div>
+                )}
+
+                {/* Title */}
+                <div>
+                  <label className={`block text-xs font-medium mb-1 ${
+                    theme === 'dark' ? 'text-cyan-300' : 'text-gray-700'
+                  }`}>
+                    <div className="flex items-center gap-1.5">
+                      <Type className="w-3 h-3" />
+                      <span>Title</span>
+                    </div>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={!selectedDate}
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="e.g., Nộp bài ASM"
+                    className={`w-full px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-slate-800 border-blue-500/20 text-cyan-100 placeholder-cyan-400/50 focus:border-cyan-500 disabled:opacity-50'
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 disabled:opacity-50'
+                    }`}
+                  />
+                </div>
+
+                {/* Time */}
+                <div>
+                  <label className={`block text-xs font-medium mb-1 ${
+                    theme === 'dark' ? 'text-cyan-300' : 'text-gray-700'
+                  }`}>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" />
+                      <span>Time</span>
+                    </div>
+                  </label>
+                  <select
+                    required
+                    disabled={!selectedDate}
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className={`w-full px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-slate-800 border-blue-500/20 text-cyan-100 focus:border-cyan-500 disabled:opacity-50'
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 disabled:opacity-50'
+                    }`}
+                  >
+                    <option value="">Select time</option>
+                    {Array.from({ length: 24 }, (_, i) => {
+                      const hour = i.toString().padStart(2, '0');
+                      return (
+                        <React.Fragment key={i}>
+                          <option value={`${hour}:00`}>{`${hour}:00`}</option>
+                          <option value={`${hour}:30`}>{`${hour}:30`}</option>
+                        </React.Fragment>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className={`block text-xs font-medium mb-1 ${
+                    theme === 'dark' ? 'text-cyan-300' : 'text-gray-700'
+                  }`}>
+                    <div className="flex items-center gap-1.5">
+                      <AlignLeft className="w-3 h-3" />
+                      <span>Note</span>
+                    </div>
+                  </label>
+                  <textarea
+                    disabled={!selectedDate}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Add notes..."
+                    rows={2}
+                    className={`w-full px-3 py-1.5 text-sm rounded-lg border transition-colors resize-none ${
+                      theme === 'dark'
+                        ? 'bg-slate-800 border-blue-500/20 text-cyan-100 placeholder-cyan-400/50 focus:border-cyan-500 disabled:opacity-50'
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 disabled:opacity-50'
+                    }`}
+                  />
+                </div>
+
+                {/* Create Button */}
+                <button
+                  type="submit"
+                  disabled={!selectedDate}
+                  className={`w-full px-4 py-2 rounded-lg font-medium text-sm text-white transition-colors flex items-center justify-center gap-2 ${
+                    theme === 'dark'
+                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create Event</span>
+                </button>
+              </form>
+            </div>
+
             {/* Today's Events */}
-            <div className="bg-white border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Today&apos;s Events</h3>
-              <div className="space-y-3">
+            <div className={`rounded-lg p-4 border ${
+              theme === 'dark'
+                ? 'bg-slate-900/60 border-blue-500/20 backdrop-blur-sm'
+                : 'bg-white border-slate-200'
+            }`}>
+              <h3 className={`text-base font-semibold mb-3 ${
+                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+              }`}>Today&apos;s Events</h3>
+              <div className="space-y-2">
                 {mockCalendarEvents
                   .filter(event => event.date === today.toISOString().split('T')[0])
                   .map((event) => {
                     const EventIcon = getEventTypeIcon(event.type);
                     return (
-                      <div key={event.id} className="flex items-start space-x-3 p-3 bg-sky-50 rounded-lg">
-                        <div className={`p-2 rounded-lg ${getEventTypeColor(event.type)}`}>
-                          <EventIcon className="w-4 h-4" />
+                      <div key={event.id} className={`flex items-start space-x-2 p-2 rounded-lg ${
+                        theme === 'dark' ? 'bg-blue-900/20' : 'bg-sky-50'
+                      }`}>
+                        <div className={`p-1.5 rounded-lg ${getEventTypeColor(event.type)}`}>
+                          <EventIcon className="w-3.5 h-3.5" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-slate-800 truncate">{event.title}</h4>
-                          <p className="text-xs text-slate-600">{event.startTime} - {event.endTime}</p>
+                          <h4 className={`text-xs font-medium truncate ${
+                            theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+                          }`}>{event.title}</h4>
+                          <p className={`text-xs ${
+                            theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
+                          }`}>{event.startTime} - {event.endTime}</p>
                           {event.project && (
-                            <p className="text-xs text-slate-500 mt-1">{event.project}</p>
+                            <p className={`text-xs mt-0.5 ${
+                              theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                            }`}>{event.project}</p>
                           )}
                         </div>
                       </div>
                     );
                   })}
                 {mockCalendarEvents.filter(event => event.date === today.toISOString().split('T')[0]).length === 0 && (
-                  <p className="text-sm text-slate-600">No events today</p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
+                  }`}>No events today</p>
                 )}
               </div>
             </div>
 
             {/* Upcoming Events */}
-            <div className="bg-white border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Upcoming</h3>
-              <div className="space-y-3">
+            <div className={`rounded-lg p-4 border ${
+              theme === 'dark'
+                ? 'bg-slate-900/60 border-blue-500/20 backdrop-blur-sm'
+                : 'bg-white border-slate-200'
+            }`}>
+              <h3 className={`text-base font-semibold mb-3 ${
+                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+              }`}>Upcoming</h3>
+              <div className="space-y-2">
                 {mockCalendarEvents
                   .filter(event => new Date(event.date) > today)
                   .slice(0, 5)
                   .map((event) => {
                     const EventIcon = getEventTypeIcon(event.type);
                     return (
-                      <div key={event.id} className="flex items-start space-x-3 p-3 bg-sky-50 rounded-lg hover:bg-sky-100 transition-colors cursor-pointer">
-                        <div className={`p-2 rounded-lg ${getEventTypeColor(event.type)}`}>
-                          <EventIcon className="w-4 h-4" />
+                      <div key={event.id} className={`flex items-start space-x-2 p-2 rounded-lg transition-colors cursor-pointer ${
+                        theme === 'dark'
+                          ? 'bg-blue-900/20 hover:bg-blue-900/30'
+                          : 'bg-sky-50 hover:bg-sky-100'
+                      }`}>
+                        <div className={`p-1.5 rounded-lg ${getEventTypeColor(event.type)}`}>
+                          <EventIcon className="w-3.5 h-3.5" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-slate-800 truncate">{event.title}</h4>
-                          <p className="text-xs text-slate-600">
+                          <h4 className={`text-xs font-medium truncate ${
+                            theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+                          }`}>{event.title}</h4>
+                          <p className={`text-xs ${
+                            theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
+                          }`}>
                             {new Date(event.date).toLocaleDateString('en-US', { 
                               month: 'short', 
                               day: 'numeric' 
                             })} • {event.startTime}
                           </p>
                           {event.project && (
-                            <p className="text-xs text-slate-500 mt-1">{event.project}</p>
+                            <p className={`text-xs mt-0.5 ${
+                              theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                            }`}>{event.project}</p>
                           )}
                         </div>
                       </div>
