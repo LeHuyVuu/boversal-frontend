@@ -1,0 +1,41 @@
+/* PrimeReact Custom Styling for Dark Theme */
+.prime-time-picker .p-calendar-dark .p-datepicker {
+  @apply bg-slate-900 border border-blue-500/20;
+}
+
+.prime-time-picker .p-calendar-dark .p-timepicker {
+  @apply bg-slate-900 border-t border-blue-500/20;
+}
+
+.prime-time-picker .p-calendar-dark .p-hour-picker,
+.prime-time-picker .p-calendar-dark .p-minute-picker,
+.prime-time-picker .p-calendar-dark .p-separator {
+  @apply text-cyan-100;
+}
+
+.prime-time-picker .p-calendar-dark .p-link {
+  @apply text-cyan-100 hover:bg-blue-900/30;
+}
+
+.prime-time-picker .p-inputtext {
+  @apply w-full;
+}
+
+/* Icon positioning */
+.prime-time-picker .p-calendar .p-button-icon-only {
+  @apply bg-transparent border-0;
+}
+
+.prime-time-picker .p-calendar-dark .p-datepicker-trigger {
+  @apply text-cyan-300 hover:text-cyan-100;
+}
+
+/* Time picker buttons */
+.prime-time-picker .p-timepicker button {
+  @apply text-cyan-300 hover:text-cyan-100 hover:bg-blue-900/30;
+}
+
+/* Selected time */
+.prime-time-picker .p-timepicker .p-link:hover {
+  @apply bg-blue-600/20;
+}

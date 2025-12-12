@@ -165,10 +165,13 @@ class ApiClient {
 // API Gateway Configuration - All requests route through Gateway
 const GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8080';
 const PROJECT_SERVICE = process.env.NEXT_PUBLIC_PROJECT_SERVICE || '/project-management-service';
+const UTILITY_SERVICE = process.env.NEXT_PUBLIC_UTILITY_SERVICE || '/utility-service';
 const API_URL = `${GATEWAY_URL}${PROJECT_SERVICE}`;
+const UTILITY_API_URL = `${GATEWAY_URL}${UTILITY_SERVICE}`;
 
 // Export a client that routes through the Next.js proxy by default so
 // credentials/cookies are forwarded from the browser to backend services.
 export const apiClient = new ApiClient(API_URL, true);
+export const utilityApiClient = new ApiClient(UTILITY_API_URL, true);
 
 export type { ApiResponse };

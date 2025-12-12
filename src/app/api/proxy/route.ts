@@ -94,8 +94,11 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(requestData),
     });
 
+    console.debug('[Proxy POST] Response status:', response.status, 'statusText:', response.statusText);
+
     // Check if response has content
     const text = await response.text();
+    console.debug('[Proxy POST] Response text:', text ? `${text.substring(0, 200)}...` : '[empty]');
     let data;
     
     try {

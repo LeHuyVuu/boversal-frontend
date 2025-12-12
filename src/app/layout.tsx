@@ -1,6 +1,7 @@
 'use client';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./globals-primereact.css";
 import { Providers } from '@/components/Providers';
 import { useEffect } from 'react';
 import { registerServiceWorker } from '@/lib/sw-register';
