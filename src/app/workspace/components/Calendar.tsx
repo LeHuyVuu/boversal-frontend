@@ -18,6 +18,7 @@ import mockCalendarEvents from '@/mocks/mockCalendarEvents.json';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Calendar as PrimeCalendar } from 'primereact/calendar';
 import { Toast } from 'primereact/toast';
+import { Tooltip } from 'primereact/tooltip';
 import 'primereact/resources/themes/lara-dark-cyan/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -365,19 +366,49 @@ export const Calendar: React.FC = () => {
                       
                       <div className="space-y-1">
                         {events.slice(0, 2).map((reminder) => {
+                          const reminderDate = utcToLocal(reminder.reminderTime);
+                          const tooltipId = `reminder-${reminder.id}`;
+                          
                           return (
-                            <div
-                              key={reminder.id}
-                              className={`text-xs p-1 rounded truncate ${
-                                reminder.isCompleted ? 'bg-green-300' : 'bg-cyan-300'
-                              } text-slate-700`}
-                              title={reminder.title}
-                            >
-                              <div className="flex items-center space-x-1">
-                                <Bell className="w-3 h-3 flex-shrink-0" />
-                                <span className="truncate">{reminder.title}</span>
+                            <React.Fragment key={reminder.id}>
+                              <Tooltip 
+                                target={`.${tooltipId}`}
+                                position="top"
+                                className="text-sm"
+                              >
+                                <div className="space-y-1.5">
+                                  <div className="font-semibold">{reminder.title}</div>
+                                  <div className="flex items-center gap-1.5 text-xs opacity-90">
+                                    <Clock className="w-3 h-3" />
+                                    {reminderDate.toLocaleString('en-US', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                      hour12: false
+                                    })}
+                                  </div>
+                                  {reminder.note && (
+                                    <div className="text-xs opacity-80 border-t border-white/20 pt-1.5 mt-1.5">
+                                      {reminder.note}
+                                    </div>
+                                  )}
+                                  <div className="text-xs opacity-75 italic">
+                                    {reminder.isCompleted ? '✓ Completed' : 'Pending'}
+                                  </div>
+                                </div>
+                              </Tooltip>
+                              <div
+                                className={`${tooltipId} text-xs p-1 rounded truncate cursor-pointer transition-transform hover:scale-105 ${
+                                  reminder.isCompleted ? 'bg-green-300' : 'bg-cyan-300'
+                                } text-slate-700`}
+                              >
+                                <div className="flex items-center space-x-1">
+                                  <Bell className="w-3 h-3 flex-shrink-0" />
+                                  <span className="truncate">{reminder.title}</span>
+                                </div>
                               </div>
-                            </div>
+                            </React.Fragment>
                           );
                         })}
                         {events.length > 2 && (

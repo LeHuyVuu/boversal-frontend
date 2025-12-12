@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const targetUrl = request.nextUrl.searchParams.get('url');
+    const endpoint = request.nextUrl.searchParams.get('endpoint');
     
-    if (!targetUrl) {
+    if (!endpoint) {
       return NextResponse.json(
-        { success: false, message: 'Missing target URL', data: null, errors: ['url parameter is required'] },
+        { success: false, message: 'Missing endpoint', data: null, errors: ['endpoint parameter is required'] },
         { status: 400 }
       );
     }
+
+    // Construct backend URL server-side (hidden from client)
+    const GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8080';
+    const PROJECT_SERVICE = process.env.NEXT_PUBLIC_PROJECT_SERVICE || '/project-management-service';
+    const targetUrl = `${GATEWAY_URL}${PROJECT_SERVICE}${endpoint}`;
 
     // Forward cookies from the client request
     const cookies = request.headers.get('cookie');
@@ -20,8 +25,8 @@ export async function GET(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
-    // Log target for server-side troubleshooting (won't be returned to clients)
-    console.debug('[Proxy GET] targetUrl:', targetUrl);
+    // Log for server-side troubleshooting (backend URL never sent to client)
+    console.debug('[Proxy GET] endpoint:', endpoint, '→ targetUrl:', targetUrl);
 
     const response = await fetch(targetUrl, {
       method: 'GET',
@@ -67,14 +72,19 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url: targetUrl, data: requestData } = body;
+    const { endpoint, data: requestData } = body;
     
-    if (!targetUrl) {
+    if (!endpoint) {
       return NextResponse.json(
-        { success: false, message: 'Missing target URL', data: null, errors: ['url is required'] },
+        { success: false, message: 'Missing endpoint', data: null, errors: ['endpoint is required'] },
         { status: 400 }
       );
     }
+
+    // Construct backend URL server-side (hidden from client)
+    const GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8080';
+    const PROJECT_SERVICE = process.env.NEXT_PUBLIC_PROJECT_SERVICE || '/project-management-service';
+    const targetUrl = `${GATEWAY_URL}${PROJECT_SERVICE}${endpoint}`;
 
     // Forward cookies from the client request
     const cookies = request.headers.get('cookie');
@@ -85,7 +95,7 @@ export async function POST(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
-    console.debug('[Proxy POST] targetUrl:', targetUrl, 'body:', requestData ? '[present]' : '[empty]');
+    console.debug('[Proxy POST] endpoint:', endpoint, '→ targetUrl:', targetUrl, 'body:', requestData ? '[present]' : '[empty]');
 
     const response = await fetch(targetUrl, {
       method: 'POST',
@@ -135,14 +145,19 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url: targetUrl, data: requestData } = body;
+    const { endpoint, data: requestData } = body;
     
-    if (!targetUrl) {
+    if (!endpoint) {
       return NextResponse.json(
-        { success: false, message: 'Missing target URL', data: null, errors: ['url is required'] },
+        { success: false, message: 'Missing endpoint', data: null, errors: ['endpoint is required'] },
         { status: 400 }
       );
     }
+
+    // Construct backend URL server-side (hidden from client)
+    const GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8080';
+    const PROJECT_SERVICE = process.env.NEXT_PUBLIC_PROJECT_SERVICE || '/project-management-service';
+    const targetUrl = `${GATEWAY_URL}${PROJECT_SERVICE}${endpoint}`;
 
     // Forward cookies from the client request
     const cookies = request.headers.get('cookie');
@@ -153,7 +168,7 @@ export async function PUT(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
-    console.debug('[Proxy PUT] targetUrl:', targetUrl, 'body:', requestData ? '[present]' : '[empty]');
+    console.debug('[Proxy PUT] endpoint:', endpoint, '→ targetUrl:', targetUrl, 'body:', requestData ? '[present]' : '[empty]');
 
     const response = await fetch(targetUrl, {
       method: 'PUT',
@@ -199,14 +214,19 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const targetUrl = request.nextUrl.searchParams.get('url');
+    const endpoint = request.nextUrl.searchParams.get('endpoint');
     
-    if (!targetUrl) {
+    if (!endpoint) {
       return NextResponse.json(
-        { success: false, message: 'Missing target URL', data: null, errors: ['url parameter is required'] },
+        { success: false, message: 'Missing endpoint', data: null, errors: ['endpoint parameter is required'] },
         { status: 400 }
       );
     }
+
+    // Construct backend URL server-side (hidden from client)
+    const GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8080';
+    const PROJECT_SERVICE = process.env.NEXT_PUBLIC_PROJECT_SERVICE || '/project-management-service';
+    const targetUrl = `${GATEWAY_URL}${PROJECT_SERVICE}${endpoint}`;
 
     // Forward cookies from the client request
     const cookies = request.headers.get('cookie');
@@ -217,7 +237,7 @@ export async function DELETE(request: NextRequest) {
       headers['Cookie'] = cookies;
     }
 
-    console.debug('[Proxy DELETE] targetUrl:', targetUrl);
+    console.debug('[Proxy DELETE] endpoint:', endpoint, '→ targetUrl:', targetUrl);
 
     const response = await fetch(targetUrl, {
       method: 'DELETE',

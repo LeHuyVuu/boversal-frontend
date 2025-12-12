@@ -66,8 +66,9 @@ export const reminderService = {
     if (response.success && response.data) {
       return response.data;
     }
-    if (response.id) {
-      return response;
+    // Check if response itself is the reminder object (direct response)
+    if ((response as any).id) {
+      return response as any as ReminderDto;
     }
     
     throw new Error('Reminder not found');
@@ -85,7 +86,7 @@ export const reminderService = {
     if (response.success && response.data) {
       return response.data;
     }
-    if (response.data && response.data.id) {
+    if (response.data && (response.data as any).id) {
       return response.data;
     }
     // Check if response itself is the reminder object
@@ -107,11 +108,12 @@ export const reminderService = {
     if (response.success && response.data) {
       return response.data;
     }
-    if (response.id) {
-      return response;
+    // Check if response itself is the reminder object
+    if ((response as any).id) {
+      return response as any as ReminderDto;
     }
     
-    throw new Error(response.message || 'Failed to update reminder');
+    throw new Error((response as any).message || 'Failed to update reminder');
   },
 
   /**

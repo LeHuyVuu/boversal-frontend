@@ -24,10 +24,12 @@ class ApiClient {
       // If proxy is enabled, route through Next.js API route
       if (this.useProxy) {
         const method = options.method || 'GET';
+        // Extract endpoint path from full URL
+        const endpointPath = endpoint.startsWith('http') ? new URL(endpoint).pathname : endpoint;
         
         if (method === 'GET' || method === 'DELETE') {
-          // For GET/DELETE, pass URL as query param
-          const proxyUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}`;
+          // For GET/DELETE, pass endpoint path as query param (not full URL)
+          const proxyUrl = `/api/proxy?endpoint=${encodeURIComponent(endpointPath)}`;
           const response = await fetch(proxyUrl, {
             method,
             credentials: 'include',
@@ -50,7 +52,7 @@ class ApiClient {
 
           return response.json();
         } else {
-          // For POST/PUT/PATCH, send URL and data in body
+          // For POST/PUT/PATCH, send endpoint path and data in body
           const response = await fetch('/api/proxy', {
             method,
             credentials: 'include',
@@ -59,7 +61,7 @@ class ApiClient {
               ...options.headers,
             },
             body: JSON.stringify({
-              url: targetUrl,
+              endpoint: endpointPath,
               data: options.body ? JSON.parse(options.body as string) : undefined,
             }),
             signal: AbortSignal.timeout(10000), // 10s timeout
