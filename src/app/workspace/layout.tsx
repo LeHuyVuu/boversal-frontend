@@ -9,7 +9,7 @@ import { Toast } from 'primereact/toast';
 import 'primereact/resources/themes/lara-dark-cyan/theme.css';
 import 'primeicons/primeicons.css';
 
-type Section = 'dashboard' | 'projects' | 'issues' | 'calendar' | 'meetings' | 'pomodoro' | 'storage' | 'documents';
+type Section = 'dashboard' | 'projects' | 'issues' | 'calendar' | 'meetings' | 'pomodoro' | 'notes' | 'storage' | 'documents';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const toast = useRef<any>(null);
