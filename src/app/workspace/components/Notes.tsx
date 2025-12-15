@@ -637,7 +637,10 @@ export default function Notes() {
                         key={tag}
                         label={tag}
                         removable
-                        onRemove={() => handleRemoveTag(tag)}
+                        onRemove={() => {
+                          handleRemoveTag(tag);
+                          return true;
+                        }}
                         className="note-tag"
                       />
                     ))}
