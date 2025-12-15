@@ -12,7 +12,8 @@ import {
   Video,
   ChevronDown,
   ChevronRight,
-  Timer
+  Timer,
+  BookOpen
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,6 +28,7 @@ const menuItems = [
     { icon: Timer, label: 'Pomodoro', key: 'pomodoro' as const },
   { icon: Calendar, label: 'Calendar', key: 'calendar' as const },
   { icon: Video, label: 'Meetings', key: 'meetings' as const },
+  { icon: BookOpen, label: 'Notes', key: 'notes' as const },
   // { icon: HardDrive, label: 'Storage', key: 'storage' as const },
   // { icon: FileText, label: 'Documents', key: 'documents' as const },
 ];
@@ -39,6 +41,7 @@ interface SidebarProps {
   | 'calendar'
   | 'meetings'
   | 'pomodoro'
+  | 'notes'
   | 'storage'
   | 'documents';
   onSectionChange: (
@@ -49,6 +52,7 @@ interface SidebarProps {
       | 'calendar'
       | 'meetings'
       | 'pomodoro'
+      | 'notes'
       | 'storage'
       | 'documents'
   ) => void;

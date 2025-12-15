@@ -1,0 +1,46 @@
+[
+  {
+    "id": "note-1",
+    "title": "Meeting Notes - Q1 Planning",
+    "content": "# Q1 Planning Meeting\n\n## Attendees\n- John Doe\n- Jane Smith\n- Mike Johnson\n\n## Key Points\n1. Launch new feature by end of Q1\n2. Increase team size by 2 developers\n3. Focus on performance optimization\n\n## Action Items\n- [ ] Create project timeline\n- [ ] Schedule follow-up meeting\n- [ ] Review budget allocation",
+    "tags": ["meeting", "planning", "q1"],
+    "createdAt": "2025-12-10T10:00:00Z",
+    "updatedAt": "2025-12-10T10:00:00Z",
+    "userId": "user-1",
+    "isPinned": true,
+    "color": "#FFE4B5"
+  },
+  {
+    "id": "note-2",
+    "title": "Project Ideas",
+    "content": "# New Project Ideas\n\n## 1. Mobile App Redesign\n- Modern UI/UX\n- Dark mode support\n- Offline functionality\n\n## 2. AI Integration\n- Chatbot for customer support\n- Smart recommendations\n- Automated reporting\n\n## 3. Performance Optimization\n- Code splitting\n- Lazy loading\n- CDN implementation",
+    "tags": ["ideas", "project", "brainstorming"],
+    "createdAt": "2025-12-12T14:30:00Z",
+    "updatedAt": "2025-12-12T15:45:00Z",
+    "userId": "user-1",
+    "isPinned": false,
+    "color": "#E6F3FF"
+  },
+  {
+    "id": "note-3",
+    "title": "Quick Todo",
+    "content": "## Things to do today\n- Review pull requests\n- Update documentation\n- Test new features\n- Deploy to staging\n- Team standup at 3pm",
+    "tags": ["todo", "daily"],
+    "createdAt": "2025-12-15T08:00:00Z",
+    "updatedAt": "2025-12-15T09:30:00Z",
+    "userId": "user-1",
+    "isPinned": true,
+    "color": "#FFE4E1"
+  },
+  {
+    "id": "note-4",
+    "title": "Learning Resources",
+    "content": "# Resources to Study\n\n## React Advanced Patterns\n- Higher Order Components\n- Render Props\n- Custom Hooks\n- Context API best practices\n\n## TypeScript\n- Advanced Types\n- Generics\n- Utility Types\n- Type Guards\n\n## Next.js 14\n- Server Components\n- App Router\n- Streaming\n- Parallel Routes",
+    "tags": ["learning", "resources", "development"],
+    "createdAt": "2025-12-08T16:20:00Z",
+    "updatedAt": "2025-12-14T11:10:00Z",
+    "userId": "user-1",
+    "isPinned": false,
+    "color": "#E0FFE0"
+  }
+]
