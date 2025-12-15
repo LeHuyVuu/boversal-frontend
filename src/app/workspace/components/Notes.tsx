@@ -676,7 +676,7 @@ export default function Notes() {
               <div className="field-checkbox">
                 <Checkbox
                   inputId="isPinned"
-                  checked={formData.isPinned}
+                  checked={formData.isPinned || false}
                   onChange={(e) => setFormData({ ...formData, isPinned: e.checked || false })}
                 />
                 <label htmlFor="isPinned" className="ml-2">
