@@ -75,7 +75,7 @@
   font-weight: 600;
   margin: 0 0 1rem 0;
   cursor: pointer;
-  color: var(--primary-color);
+  color: #000000;
 }
 
 .note-card-title:hover {
@@ -83,7 +83,7 @@
 }
 
 .note-card-preview {
-  color: var(--text-color-secondary);
+  color: #000000;
   line-height: 1.6;
   margin-bottom: 1rem;
   min-height: 80px;
